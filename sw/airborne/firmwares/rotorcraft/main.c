@@ -289,6 +289,10 @@ static inline void on_baro_dif_event( void ) {
 
 static inline void on_gps_event(void) {
   ins_update_gps();
+#if USE_AHRS
+  ahrs_update_gps();
+#endif
+
 #ifdef USE_VEHICLE_INTERFACE
   if (gps.fix == GPS_FIX_3D)
     vi_notify_gps_available();
