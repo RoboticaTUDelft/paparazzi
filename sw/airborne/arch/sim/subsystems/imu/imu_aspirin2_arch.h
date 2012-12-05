@@ -26,8 +26,4 @@
 #define IMU_ASPIRIN2_ARCH_H
 
 
-extern void imu_feed_gyro_accel(void);
-extern void imu_feed_mag(void);
-
-
 #endif /* IMU_ASPIRIN2_ARCH_H */

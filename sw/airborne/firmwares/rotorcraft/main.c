@@ -78,6 +78,7 @@ static inline void on_baro_abs_event( void );
 static inline void on_baro_dif_event( void );
 static inline void on_gps_event( void );
 static inline void on_mag_event( void );
+static inline void on_navdata_event( void );
 
 
 tid_t main_periodic_tid; ///< id for main_periodic() timer
@@ -156,7 +157,7 @@ STATIC_INLINE void main_init( void ) {
   electrical_tid = sys_time_register_timer(0.1, NULL);
   baro_tid = sys_time_register_timer(0.02, NULL);
   telemetry_tid = sys_time_register_timer((1./60.), NULL);
-  navdata_tid = sys_time_register_timer((0.5), NULL);
+  navdata_tid = sys_time_register_timer((1./PERIODIC_FREQUENCY), NULL);
 }
 
 STATIC_INLINE void handle_periodic_tasks( void ) {
@@ -181,9 +182,6 @@ STATIC_INLINE void handle_periodic_tasks( void ) {
 
 STATIC_INLINE void main_periodic( void ) {
 
-	navdata_read_once();
-
-
   imu_periodic();
 
   /* run control loops */
@@ -205,12 +203,8 @@ STATIC_INLINE void telemetry_periodic(void) {
   PeriodicSendMain(DefaultChannel,DefaultDevice);
 }
 
-STATIC_INLINE void navdata_periodic(void) {
-	navdata = navdata_getMeasurements();
-
-	printf("acc    ?(%d, %d, %d)\n", navdata->ax, navdata->ay, navdata->az);
-	printf("gyro   ?(%d, %d, %d)\n", navdata->vx, navdata->vy, navdata->vz);
-	printf("magneto?(%d, %d, %d)\n", navdata->mx, navdata->my, navdata->mz);
+STATIC_INLINE void navdata_periodic(void){
+  navdata_read_once();
 }
 
 STATIC_INLINE void failsafe_check( void ) {
@@ -251,6 +245,8 @@ STATIC_INLINE void main_event( void ) {
   ImuEvent(on_gyro_event, on_accel_event, on_mag_event);
 
   BaroEvent(on_baro_abs_event, on_baro_dif_event);
+
+  NavdataEvent(on_navdata_event);
 
 #if USE_GPS
   GpsEvent(on_gps_event);
@@ -328,4 +324,12 @@ static inline void on_mag_event(void) {
 #ifdef USE_VEHICLE_INTERFACE
   vi_notify_mag_available();
 #endif
+}
+
+static inline void on_navdata_event(void) {
+	navdata = navdata_getMeasurements();
+
+	printf("acc    ?(%d, %d, %d)\n", navdata->ax, navdata->ay, navdata->az);
+	printf("gyro   ?(%d, %d, %d)\n", navdata->vx, navdata->vy, navdata->vz);
+	printf("magneto?(%d, %d, %d)\n", navdata->mx, navdata->my, navdata->mz);
 }

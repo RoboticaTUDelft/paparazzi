@@ -14,12 +14,13 @@ void baro_init(void) {
   baro.status = BS_UNINITIALIZED;
   baro.absolute     = 0;
   baro.differential = 0;
+  baro_data_available = FALSE;
 }
 
 void baro_periodic(void) {
 //FIXME: if statement pass condition has to be set according to navdata
-  if(navdata_ontvangen){
+//  if(navdata_ontvangen){
 	baro.status = BS_RUNNING;
-    available = TRUE;
-  }
+    baro_data_available = TRUE;
+//  }
 }

@@ -9,15 +9,17 @@
 #define BOARDS_ARDRONE2_BARO_H
 #include "navdata.h"
 
+int baro_data_available;
+
 static inline void baro_event(void (*b_abs_handler)(void), void (*b_diff_handler)(void)){
-  if (available) {
-    baro.absolute = navdata.pressure
+  if (baro_data_available) {
+//    baro.absolute = navdata.pressure
     b_abs_handler();
   }
 }
 
 #define BaroEvent(_b_abs_handler, _b_diff_handler) {\
-  baro_event(_b_abs_handler,_b_diff_handler)\
+  baro_event(_b_abs_handler,_b_diff_handler);\
 }
 
 #endif /* BOARDS_ARDRONE2_BARO_H */

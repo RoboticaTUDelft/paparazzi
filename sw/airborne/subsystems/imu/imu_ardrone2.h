@@ -10,14 +10,14 @@
 //FIXME: set correct location and file name
 #include "navdata.h"
 
-int imu_available;
+int imu_data_available;
 
 extern struct ImuARDrone2 imu_ardrone2;
 
 static inline void imu_ardrone2_event ( void (* _gyro_handler)(void), void (* _accel_handler)(void), void (* _mag_handler)(void))
 {
-  if (imu_available) {
-    imu_available = FALSE;
+  if (imu_data_available) {
+    imu_data_available = FALSE;
 	_gyro_handler();
 	_accel_handler();
 	_mag_handler();

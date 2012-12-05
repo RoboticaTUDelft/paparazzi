@@ -14,7 +14,7 @@ $(TARGET).ARCHDIR = $(ARCH)
 
 # -----------------------------------------------------------------------
 USER=foobar
-HOST=ardrone2
+HOST=192.168.1.1
 SUB_DIR=bin
 FTP_DIR=/data/video
 TARGET_DIR=$(FTP_DIR)/$(SUB_DIR)
