@@ -249,3 +249,7 @@ SRC_FMS=fms
 ap.CFLAGS += -I. -I$(SRC_FMS)
 ap.srcs   += $(SRC_FMS)/fms_serial_port.c
 endif
+
+ap.CFLAGS +=-DARDRONE2
+ap.srcs   += $(SRC_BOARD)/navdata.c
+

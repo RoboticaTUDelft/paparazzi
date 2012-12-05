@@ -66,6 +66,12 @@
 
 #include "generated/modules.h"
 
+#if ARDRONE2
+#include "navdata.h"
+measures_t* navdata;
+#include <stdio.h>
+#endif
+
 static inline void on_gyro_event( void );
 static inline void on_accel_event( void );
 static inline void on_baro_abs_event( void );
@@ -80,6 +86,7 @@ tid_t radio_control_tid; ///< id for radio_control_periodic_task() timer
 tid_t electrical_tid;    ///< id for electrical_periodic() timer
 tid_t baro_tid;          ///< id for baro_periodic() timer
 tid_t telemetry_tid;     ///< id for telemetry_periodic() timer
+tid_t navdata_tid;
 
 #ifndef SITL
 int main( void ) {
@@ -93,6 +100,8 @@ int main( void ) {
 #endif /* SITL */
 
 STATIC_INLINE void main_init( void ) {
+
+	navdata_init();
 
   mcu_init();
 
@@ -147,6 +156,7 @@ STATIC_INLINE void main_init( void ) {
   electrical_tid = sys_time_register_timer(0.1, NULL);
   baro_tid = sys_time_register_timer(0.02, NULL);
   telemetry_tid = sys_time_register_timer((1./60.), NULL);
+  navdata_tid = sys_time_register_timer((0.5), NULL);
 }
 
 STATIC_INLINE void handle_periodic_tasks( void ) {
@@ -165,9 +175,14 @@ STATIC_INLINE void handle_periodic_tasks( void ) {
     baro_periodic();
   if (sys_time_check_and_ack_timer(telemetry_tid))
     telemetry_periodic();
+  if (sys_time_check_and_ack_timer(navdata_tid))
+	  navdata_periodic();
 }
 
 STATIC_INLINE void main_periodic( void ) {
+
+	navdata_read_once();
+
 
   imu_periodic();
 
@@ -188,6 +203,14 @@ STATIC_INLINE void main_periodic( void ) {
 
 STATIC_INLINE void telemetry_periodic(void) {
   PeriodicSendMain(DefaultChannel,DefaultDevice);
+}
+
+STATIC_INLINE void navdata_periodic(void) {
+	navdata = navdata_getMeasurements();
+
+	printf("acc    ?(%d, %d, %d)\n", navdata->ax, navdata->ay, navdata->az);
+	printf("gyro   ?(%d, %d, %d)\n", navdata->vx, navdata->vy, navdata->vz);
+	printf("magneto?(%d, %d, %d)\n", navdata->mx, navdata->my, navdata->mz);
 }
 
 STATIC_INLINE void failsafe_check( void ) {
