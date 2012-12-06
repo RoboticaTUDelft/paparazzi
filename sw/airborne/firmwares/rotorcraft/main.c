@@ -80,7 +80,6 @@ static inline void on_gps_event( void );
 static inline void on_mag_event( void );
 static inline void on_navdata_event( void );
 
-
 tid_t main_periodic_tid; ///< id for main_periodic() timer
 tid_t failsafe_tid;      ///< id for failsafe_check() timer
 tid_t radio_control_tid; ///< id for radio_control_periodic_task() timer
@@ -102,7 +101,7 @@ int main( void ) {
 
 STATIC_INLINE void main_init( void ) {
 
-	navdata_init();
+  navdata_init();
 
   mcu_init();
 
@@ -329,7 +328,7 @@ static inline void on_mag_event(void) {
 static inline void on_navdata_event(void) {
 	navdata = navdata_getMeasurements();
 
-	printf("acc    ?(%d, %d, %d)\n", navdata->ax, navdata->ay, navdata->az);
-	printf("gyro   ?(%d, %d, %d)\n", navdata->vx, navdata->vy, navdata->vz);
-	printf("magneto?(%d, %d, %d)\n", navdata->mx, navdata->my, navdata->mz);
+//	printf("acc    ?(%d, %d, %d)\n", navdata->ax, navdata->ay, navdata->az);
+//	printf("gyro   ?(%d, %d, %d)\n", navdata->vx, navdata->vy, navdata->vz);
+//	printf("magneto?(%d, %d, %d)\n", navdata->mx, navdata->my, navdata->mz);
 }

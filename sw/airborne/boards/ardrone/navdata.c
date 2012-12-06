@@ -13,13 +13,13 @@
 #include "navdata.h"
 
 int nav_fd;
+int navdata_parced;
 unsigned int nextReadSize;
-short int startFound;
-short int startOffset;
+short int navdata_writeToBlock;
+int debug;
 
-raw_navdata rn_buffer;
 raw_navdata rn;
-raw_navdata *rn_ptr;
+raw_navdata* rn_ptr;
 measures_t *navdata;
 
 int navdata_init()
@@ -58,21 +58,22 @@ int navdata_init()
 
 	// initialize buffers
 	for (int i = 0; i < 60; i++) {
-		rn_buffer.block[i] = 0;
-		rn_buffer.buffer[i] = 0;
 		rn.block[i] = 0;
+	}
+
+	for (int i = 0; i < 120; i++){
 		rn.buffer[i] = 0;
 	}
-	rn_buffer.blockIndex = 0;
-	rn_buffer.bufferSize = 0;
+
 	rn.blockIndex = 0;
 	rn.bufferSize = 0;
 
-	rn_ptr = &rn_buffer;
-	nextReadSize = 60;
-	startFound = 0;
+	rn_ptr = &rn;
+	nextReadSize = 120;
 
 	navdata = (measures_t*) &(rn.block);
+
+	debug = 0;
 
 	return 0;
 }
@@ -82,92 +83,79 @@ void navdata_close()
 	close(nav_fd);
 }
 
-void navdata_appendBuffer(raw_navdata* ptr, int offset)
+void navdata_readFromBuffer(raw_navdata* ptr)
 {
-	if ((ptr->blockIndex + (ptr->bufferSize - offset)) < 60) {
-		for(int i = offset; i < ptr->bufferSize; i++)
-		{
-			printf("%02X ", ptr->buffer[i]);
-			ptr->block[ptr->blockIndex + i] = ptr->buffer[i];
-			ptr->blockIndex++;	// could this be integrated in the previous line like this: [ptr->blockIndex++ + i]?
+	if(navdata_writeToBlock == 0){
+		for (int i = 0; i < ptr->bufferSize; i++){
+			if (ptr->buffer[i] == 0x3a){
+				ptr->blockIndex = i;
+				navdata_writeToBlock = 1;
+				navdata_fill_block(ptr);
+				break;
+			}
 		}
-		printf("\n");
 	}
 }
 
 void navdata_read_once()
 {
 	rn_ptr->bufferSize = read(nav_fd, rn_ptr->buffer, nextReadSize);
-	printf("Read %d bytes. Next read size: %d bytes.\n", rn_ptr->bufferSize, nextReadSize);
+//	printf("Read %d bytes. Next read size: %d bytes.\n", rn_ptr->bufferSize, (nextReadSize - rn_ptr->bufferSize));
+
+	nextReadSize -= rn_ptr->bufferSize;
 
 	// if we read a buffer smaller than or equal to 60 bytes
-	if (rn_ptr->bufferSize <= 60) {
-
-		if (startFound == 1) {
-			printf("Startfound before...\n");
-			navdata_appendBuffer(rn_ptr, 0);
-			printf("nextReadSize(b2) = %d\n", nextReadSize);
-//			nextReadSize -= rn_ptr->bufferSize;
-			printf("nextReadSize(a2) = %d\n", nextReadSize);
-		} else {
-			printf("Startfound not found...\n");
-			for (int i = 0; i < rn_ptr->bufferSize; i++) {
-				if (rn_ptr->buffer[i] == 0x3a) {
-					printf("Startfound found just now...\n");
-//					navdata_appendBuffer(rn_ptr, i);
-					printf("nextReadSize(b) = %d\n", nextReadSize);
-//					nextReadSize -= (rn_ptr->bufferSize - i);
-					printf("nextReadSize(a) = %d\n", nextReadSize);
-					startFound = 1;
-				}
-			}
-		}
-
-	}
-
-	if (rn_ptr->blockIndex > 0) {
-		nextReadSize = 60 - rn_ptr->blockIndex + 1;
+	if (nextReadSize > 0) {
+		printf("Buffer not filled completely\n");
 	}
 
 	// if we have gathered a full block
-	if (nextReadSize == 0) {
+	else if (nextReadSize == 0) {
+		navdata_readFromBuffer(rn_ptr);
 
 		// the 60 byte block has to start with 0x3a (dec:58)
-		if (rn_ptr->block[0] == 0x3a) {
+		if (debug == 1){
 			for (int bi = 0; bi < 60; bi++) {
 				printf("%02X ", rn_ptr->block[bi]);
 			}
-
-			//				navdata = (measures_t*)rn_ptr->block;
-			//				printf("v?(%d, %d, %d)\n", navdata->vx, navdata->vy, navdata->vz);
-			//				printf("\n");
-
-			//copy the rn_buffer to rn, this is a full block ready for reading
-//			memcpy(&rn, &rn_buffer, sizeof(raw_navdata));
 		}
+		nextReadSize = 120;
+		rn_ptr->blockIndex = 0;
 	}
 
-	if (nextReadSize <= 0) {
+	else {
 		// when a composed block is fully read, reset the nextReadSize
-		nextReadSize = 60;
+		nextReadSize = 120;
 		rn_ptr->blockIndex = 0;
-		// reset the block array and next read size
-//		memset(rn_ptr->block, 0, 60);
-		startFound = 0;
-		printf("Reset startfound...\n");
+
+		printf("Error: nextReadSize < 0");
 	}
+}
+
+void navdata_fill_block(raw_navdata* nfb_ptr){
+	for (int i = 0; i < 60; i++){
+		nfb_ptr->block[i] = nfb_ptr->buffer[nfb_ptr->blockIndex + i];
+	}
+
+	navdata_writeToBlock = 0;
 }
 
 measures_t* navdata_getMeasurements()
 {
-//	navdata = (measures_t*) &(rn.block);
+	navdata = (measures_t*) &(rn.block);
 	navdata_checksum();
 	return navdata;
+}
+
+void navdata_event(void (* _navdata_handler)(void)){
+//	printf("NavDataEvent!");
+	_navdata_handler();
 }
 
 void navdata_checksum()
 {
 	uint16_t checksum = 0;
+	checksum += navdata->taille;
 	checksum += navdata->nu_trame;
 	checksum += navdata->ax;
 	checksum += navdata->ay;

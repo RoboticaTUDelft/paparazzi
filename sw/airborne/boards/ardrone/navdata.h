@@ -16,10 +16,10 @@
 // u08 = uint8_t
 
 typedef struct {
-	uint8_t buffer[60];
-	uint8_t bufferSize;
+	uint8_t buffer[120];
+	int bufferSize;
 	uint8_t block[60];
-	uint8_t blockIndex;
+	int blockIndex;
 } raw_navdata;
 
 typedef struct
@@ -68,11 +68,16 @@ typedef struct
 
 int navdata_init(void);
 void navdata_close(void);
-void navdata_appendBuffer(raw_navdata* ptr, int offset);
+void navdata_readFromBuffer(raw_navdata* ptr);
 void navdata_read_once(void);
 measures_t* navdata_getMeasurements(void);
 void navdata_checksum(void);
+void navdata_fill_block(raw_navdata* nfb_ptr);
 
+void navdata_event(void (* _navdata_handler)(void));
 
+#define NavdataEvent(_navdata_handler) { \
+  navdata_event(_navdata_handler); \
+}
 
 #endif /* NAVDATA_H_ */
