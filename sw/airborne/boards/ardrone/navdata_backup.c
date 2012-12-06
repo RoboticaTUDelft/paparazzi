@@ -89,9 +89,10 @@ void navdata_appendBuffer(raw_navdata* ptr, int offset)
 		{
 			printf("%02X ", ptr->buffer[i]);
 			ptr->block[ptr->blockIndex + i] = ptr->buffer[i];
-			ptr->blockIndex++;	// could this be integrated in the previous line like this: [ptr->blockIndex++ + i]?
+				// could this be integrated in the previous line like this: [ptr->blockIndex++ + i]?
 		}
 		printf("\n");
+		ptr->blockIndex += ptr->bufferSize - offset;
 	}
 }
 

@@ -20,7 +20,6 @@ int debug;
 
 raw_navdata rn;
 raw_navdata* rn_ptr;
-measures_t *navdata;
 
 int navdata_init()
 {
@@ -72,6 +71,7 @@ int navdata_init()
 	nextReadSize = 120;
 
 	navdata = (measures_t*) &(rn.block);
+	navdata_check = 0;
 
 	debug = 0;
 
@@ -118,6 +118,7 @@ void navdata_read_once()
 			for (int bi = 0; bi < 60; bi++) {
 				printf("%02X ", rn_ptr->block[bi]);
 			}
+			printf("\n");
 		}
 		nextReadSize = 120;
 		rn_ptr->blockIndex = 0;
@@ -140,22 +141,17 @@ void navdata_fill_block(raw_navdata* nfb_ptr){
 	navdata_writeToBlock = 0;
 }
 
-measures_t* navdata_getMeasurements()
-{
-	navdata = (measures_t*) &(rn.block);
-	navdata_checksum();
-	return navdata;
+void navdata_setMeasurements() {
+	navdata_check = navdata_checksum();
 }
 
 void navdata_event(void (* _navdata_handler)(void)){
-//	printf("NavDataEvent!");
 	_navdata_handler();
 }
 
-void navdata_checksum()
+uint16_t navdata_checksum()
 {
 	uint16_t checksum = 0;
-	checksum += navdata->taille;
 	checksum += navdata->nu_trame;
 	checksum += navdata->ax;
 	checksum += navdata->ay;
@@ -183,7 +179,5 @@ void navdata_checksum()
 	checksum += navdata->my;
 	checksum += navdata->mz;
 
-	printf("Size of calculated checksum: %d\n", checksum);
-	printf("Size of given checksum: %d\n", navdata->chksum);
-
+	return abs(navdata->chksum - checksum);
 }

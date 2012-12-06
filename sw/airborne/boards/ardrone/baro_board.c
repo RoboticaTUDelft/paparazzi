@@ -8,6 +8,9 @@
 #include "subsystems/sensors/baro.h"
 #include "navdata.h"
 
+//test
+#include <stdio.h>
+
 struct Baro baro;
 
 void baro_init(void) {
@@ -18,9 +21,12 @@ void baro_init(void) {
 }
 
 void baro_periodic(void) {
-//FIXME: if statement pass condition has to be set according to navdata
-//  if(navdata_ontvangen){
 	baro.status = BS_RUNNING;
-    baro_data_available = TRUE;
-//  }
+	if(navdata_check == 0){
+		baro.absolute = navdata->pressure;
+		baro_data_available = TRUE;
+//		printf("baro   ?:pressure = %d\n", baro.absolute);
+  }
+  else
+	  baro_data_available = FALSE;
 }

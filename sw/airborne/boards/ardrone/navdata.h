@@ -66,12 +66,15 @@ typedef struct
 
 } __attribute__ ((packed)) measures_t;
 
+measures_t* navdata;
+uint16_t navdata_check;
+
 int navdata_init(void);
 void navdata_close(void);
 void navdata_readFromBuffer(raw_navdata* ptr);
 void navdata_read_once(void);
-measures_t* navdata_getMeasurements(void);
-void navdata_checksum(void);
+void navdata_setMeasurements(void);
+uint16_t navdata_checksum(void);
 void navdata_fill_block(raw_navdata* nfb_ptr);
 
 void navdata_event(void (* _navdata_handler)(void));

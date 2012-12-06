@@ -68,7 +68,7 @@
 
 #if ARDRONE2
 #include "navdata.h"
-measures_t* navdata;
+
 #include <stdio.h>
 #endif
 
@@ -326,8 +326,7 @@ static inline void on_mag_event(void) {
 }
 
 static inline void on_navdata_event(void) {
-	navdata = navdata_getMeasurements();
-
+	navdata_setMeasurements();
 //	printf("acc    ?(%d, %d, %d)\n", navdata->ax, navdata->ay, navdata->az);
 //	printf("gyro   ?(%d, %d, %d)\n", navdata->vx, navdata->vy, navdata->vz);
 //	printf("magneto?(%d, %d, %d)\n", navdata->mx, navdata->my, navdata->mz);

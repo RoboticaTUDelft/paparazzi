@@ -13,7 +13,6 @@ int baro_data_available;
 
 static inline void baro_event(void (*b_abs_handler)(void), void (*b_diff_handler)(void)){
   if (baro_data_available) {
-//    baro.absolute = navdata.pressure
     b_abs_handler();
   }
 }

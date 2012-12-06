@@ -12,8 +12,6 @@
 
 int imu_data_available;
 
-extern struct ImuARDrone2 imu_ardrone2;
-
 static inline void imu_ardrone2_event ( void (* _gyro_handler)(void), void (* _accel_handler)(void), void (* _mag_handler)(void))
 {
   if (imu_data_available) {
