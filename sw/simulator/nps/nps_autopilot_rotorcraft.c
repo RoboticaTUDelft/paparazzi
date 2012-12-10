@@ -87,10 +87,10 @@ void nps_autopilot_run_step(double time __attribute__ ((unused))) {
     main_event();
   }
 
-  if (nps_sensors_gps_available()) {
-    gps_feed_value();
-    main_event();
-  }
+//  if (nps_sensors_gps_available()) {
+//    gps_feed_value();
+//    main_event();
+//  }
 
   if (nps_bypass_ahrs) {
     sim_overwrite_ahrs();

@@ -109,7 +109,7 @@ static inline bool_t sys_time_check_and_ack_timer(tid_t id) {
 
 /* paparazzi sys_time timers */
 #ifndef SYS_TIME_RESOLUTION
-#define SYS_TIME_RESOLUTION ( 1./8192. )
+#define SYS_TIME_RESOLUTION ( 1./1024. )
 #endif
 #define SYS_TIME_RESOLUTION_CPU_TICKS CPU_TICKS_OF_SEC(SYS_TIME_RESOLUTION)
 

@@ -68,8 +68,6 @@
 
 #if ARDRONE2
 #include "navdata.h"
-
-#include <stdio.h>
 #endif
 
 static inline void on_gyro_event( void );
@@ -78,7 +76,10 @@ static inline void on_baro_abs_event( void );
 static inline void on_baro_dif_event( void );
 static inline void on_gps_event( void );
 static inline void on_mag_event( void );
+
+#if ARDRONE2
 static inline void on_navdata_event( void );
+#endif
 
 tid_t main_periodic_tid; ///< id for main_periodic() timer
 tid_t failsafe_tid;      ///< id for failsafe_check() timer
@@ -101,7 +102,9 @@ int main( void ) {
 
 STATIC_INLINE void main_init( void ) {
 
+#if ARDRONE2
   navdata_init();
+#endif
 
   mcu_init();
 
@@ -129,7 +132,9 @@ STATIC_INLINE void main_init( void ) {
   baro_init();
   imu_init();
   autopilot_init();
+#if ARDRONE2
   nav_init();
+#endif
   guidance_h_init();
   guidance_v_init();
   stabilization_init();
@@ -156,7 +161,9 @@ STATIC_INLINE void main_init( void ) {
   electrical_tid = sys_time_register_timer(0.1, NULL);
   baro_tid = sys_time_register_timer(0.02, NULL);
   telemetry_tid = sys_time_register_timer((1./60.), NULL);
+#if ARDRONE2
   navdata_tid = sys_time_register_timer((1./PERIODIC_FREQUENCY), NULL);
+#endif
 }
 
 STATIC_INLINE void handle_periodic_tasks( void ) {
@@ -175,8 +182,10 @@ STATIC_INLINE void handle_periodic_tasks( void ) {
     baro_periodic();
   if (sys_time_check_and_ack_timer(telemetry_tid))
     telemetry_periodic();
+#if ARDRONE2
   if (sys_time_check_and_ack_timer(navdata_tid))
 	  navdata_periodic();
+#endif
 }
 
 STATIC_INLINE void main_periodic( void ) {
@@ -202,9 +211,11 @@ STATIC_INLINE void telemetry_periodic(void) {
   PeriodicSendMain(DefaultChannel,DefaultDevice);
 }
 
+#if ARDRONE2
 STATIC_INLINE void navdata_periodic(void){
   navdata_read_once();
 }
+#endif
 
 STATIC_INLINE void failsafe_check( void ) {
   if (
@@ -245,7 +256,9 @@ STATIC_INLINE void main_event( void ) {
 
   BaroEvent(on_baro_abs_event, on_baro_dif_event);
 
+#if ARDRONE2
   NavdataEvent(on_navdata_event);
+#endif
 
 #if USE_GPS
   GpsEvent(on_gps_event);
@@ -325,9 +338,8 @@ static inline void on_mag_event(void) {
 #endif
 }
 
+#if ARDRONE2
 static inline void on_navdata_event(void) {
 	navdata_setMeasurements();
-//	printf("acc    ?(%d, %d, %d)\n", navdata->ax, navdata->ay, navdata->az);
-//	printf("gyro   ?(%d, %d, %d)\n", navdata->vx, navdata->vy, navdata->vz);
-//	printf("magneto?(%d, %d, %d)\n", navdata->mx, navdata->my, navdata->mz);
 }
+#endif
