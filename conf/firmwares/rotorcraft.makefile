@@ -188,6 +188,8 @@ else ifeq ($(ARCH), omap_ardrone2)
 ap.srcs   += $(SRC_ARCH)/subsystems/electrical/electrical_arch.c
 ap.srcs   += $(SRC_BOARD)/vbat.c
 ap.srcs   += $(SRC_BOARD)/navdata.c
+ap.srcs   += $(SRC_BOARD)/gpio.c
+ap.srcs   += $(SRC_BOARD)/motorboard.c
 ap.CFLAGS +=-DARDRONE2
 endif
 
