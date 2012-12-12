@@ -104,7 +104,7 @@ void navdata_read_once()
 
 	nextReadSize -= rn_ptr->bufferSize;
 
-	// if we read a buffer smaller than or equal to 60 bytes
+	// if we read a buffer smaller than or equal to 120 bytes
 	if (nextReadSize > 0) {
 		printf("Buffer not filled completely\n");
 	}
@@ -113,7 +113,7 @@ void navdata_read_once()
 	else if (nextReadSize == 0) {
 		navdata_readFromBuffer(rn_ptr);
 
-		// the 60 byte block has to start with 0x3a (dec:58)
+		// the 60 byte output block has to start with 0x3a (dec:58)
 		if (debug == 1){
 			for (int bi = 0; bi < 60; bi++) {
 				printf("%02X ", rn_ptr->block[bi]);
@@ -143,6 +143,7 @@ void navdata_fill_block(raw_navdata* nfb_ptr){
 
 void navdata_setMeasurements() {
 	navdata_check = navdata_checksum();
+//	printf("navdata_check = %d\n", navdata_check);
 }
 
 void navdata_event(void (* _navdata_handler)(void)){
@@ -179,5 +180,6 @@ uint16_t navdata_checksum()
 	checksum += navdata->my;
 	checksum += navdata->mz;
 
-	return abs(navdata->chksum - checksum);
+	uint16_t error = navdata->chksum - checksum;
+	return abs(error);
 }

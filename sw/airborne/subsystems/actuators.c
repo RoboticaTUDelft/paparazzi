@@ -37,5 +37,4 @@ void actuators_init(void) {
   AllActuatorsInit();
 
 }
-
-#endif
+#endif /* ACTUATORS_NB_ */
