@@ -5,9 +5,6 @@
 #include "subsystems/imu.h"
 #include "navdata.h"
 
-//stdio only included for debugging
-#include <stdio.h>
-
 void imu_impl_init(void) {
   imu_data_available = FALSE;
 }
@@ -18,13 +15,10 @@ void imu_impl_init(void) {
  * tells the AHRS (indirectly) that the data is available
  */
 void imu_periodic(void) {
-//	printf("imu test 1");
 	if (navdata_check == 0){
-//		printf("imu test 2");
 		RATES_ASSIGN(imu.gyro_unscaled, navdata->vx, navdata->vy, navdata->vz);
 		VECT3_ASSIGN(imu.accel_unscaled, navdata->ax, navdata->ay, navdata->az);
 		VECT3_ASSIGN(imu.mag_unscaled, navdata->mz, -(navdata->mx), navdata->my);
-		printf("mag = (%d,%d,%d)", navdata->mz, -(navdata->mx), navdata->my);
 		imu_data_available = TRUE;
 	}
 	else
