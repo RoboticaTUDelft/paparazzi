@@ -34,6 +34,8 @@
 #include "mcu_periph/sys_time.h"
 #include CONFIG
 
+#include <stdio.h>
+
 
 /* holds the servo pulses width in clock ticks */
 uint16_t servo_widths[_4017_NB_CHANNELS];
@@ -53,6 +55,7 @@ uint16_t servo_widths[_4017_NB_CHANNELS];
  * Ideally, you can use two decade counters to drive 20 servos.
  */
 void actuators_init( void ) {
+  printf("SERVOS 4017");
   uint8_t i;
   /* Configure the reset and clock lines as output  */
   _4017_RESET_DDR |= _BV(_4017_RESET_PIN);

@@ -76,7 +76,6 @@ static inline void on_baro_abs_event( void );
 static inline void on_baro_dif_event( void );
 static inline void on_gps_event( void );
 static inline void on_mag_event( void );
-
 #if ARDRONE2
 static inline void on_navdata_event( void );
 #endif
@@ -113,6 +112,7 @@ STATIC_INLINE void main_init( void ) {
   stateInit();
 
   actuators_init();
+
 #if USE_MOTOR_MIXING
   motor_mixing_init();
 #endif
@@ -132,9 +132,11 @@ STATIC_INLINE void main_init( void ) {
   baro_init();
   imu_init();
   autopilot_init();
+
 #if ARDRONE2
   nav_init();
 #endif
+
   guidance_h_init();
   guidance_v_init();
   stabilization_init();
