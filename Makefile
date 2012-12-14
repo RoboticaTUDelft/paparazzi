@@ -74,7 +74,7 @@ SUBDIRS = $(PPRZCENTER) $(MISC) $(LOGALIZER)
 #
 MESSAGES_XML = $(CONF)/messages.xml
 
-_XML = $(CONF)/ubx.xml
+UBX_XML = $(CONF)/ubx.xml
 MTK_XML = $(CONF)/mtk.xml
 XSENS_XML = $(CONF)/xsens_MTi-G.xml
 SIRF_XML = $(CONF)/sirf.xml
