@@ -197,6 +197,8 @@ endif
 # or
 # include subsystems/rotorcraft/gps_skytraq.makefile
 # or
+# include subsystems/rotorcraft/gps_sirf.makefile
+# or
 # nothing
 #
 

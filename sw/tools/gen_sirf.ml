@@ -79,10 +79,10 @@ let parse_message = fun m ->
     else
       List.fold_right param_names (Xml.children f) r in
   let param_type = fun f -> c_type (format f) in
-  fprintf out "\n#define SirfSend_%s_%s(" class_name msg_name;
+  fprintf out "\n#define SirfSend_%s(" msg_name;
   fprintf out "%s" (String.concat "," (param_names m []));
   fprintf out ") { \\\n";
-  fprintf out "  SirfHeader(SIRF_%s_ID, %s, %d);\\\n" class_name msg_id !offset;
+  fprintf out "  SirfHeader(SIRF_ID, %s, %d);\\\n" msg_id !offset;
   let rec send_one_field = fun f ->
     match Xml.tag f with
       "field" ->

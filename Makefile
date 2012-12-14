@@ -73,9 +73,11 @@ SUBDIRS = $(PPRZCENTER) $(MISC) $(LOGALIZER)
 # xml files used as input for header generation
 #
 MESSAGES_XML = $(CONF)/messages.xml
-UBX_XML = $(CONF)/ubx.xml
+
+_XML = $(CONF)/ubx.xml
 MTK_XML = $(CONF)/mtk.xml
 XSENS_XML = $(CONF)/xsens_MTi-G.xml
+SIRF_XML = $(CONF)/sirf.xml
 
 #
 # generated header files
@@ -84,12 +86,13 @@ MESSAGES_H=$(STATICINCLUDE)/messages.h
 MESSAGES2_H=$(STATICINCLUDE)/messages2.h
 UBX_PROTOCOL_H=$(STATICINCLUDE)/ubx_protocol.h
 MTK_PROTOCOL_H=$(STATICINCLUDE)/mtk_protocol.h
+SIRF_PROTOCOL_H=$(STATICINCLUDE)/sirf_protocol.h
 XSENS_PROTOCOL_H=$(STATICINCLUDE)/xsens_protocol.h
 DL_PROTOCOL_H=$(STATICINCLUDE)/dl_protocol.h
 DL_PROTOCOL2_H=$(STATICINCLUDE)/dl_protocol2.h
 ABI_MESSAGES_H=$(STATICINCLUDE)/abi_messages.h
 
-GEN_HEADERS = $(MESSAGES_H) $(MESSAGES2_H) $(UBX_PROTOCOL_H) $(MTK_PROTOCOL_H) $(XSENS_PROTOCOL_H) $(DL_PROTOCOL_H) $(DL_PROTOCOL2_H) $(ABI_MESSAGES_H)
+GEN_HEADERS = $(MESSAGES_H) $(MESSAGES2_H) $(UBX_PROTOCOL_H) $(MTK_PROTOCOL_H) $(SIRF_PROTOCOL_H)$(XSENS_PROTOCOL_H) $(DL_PROTOCOL_H) $(DL_PROTOCOL2_H) $(ABI_MESSAGES_H) 
 
 
 all: print_build_version update_google_version conf ext lib subdirs lpctools commands static
@@ -170,6 +173,11 @@ $(MTK_PROTOCOL_H) : $(MTK_XML) tools
 	$(Q)PAPARAZZI_SRC=$(PAPARAZZI_SRC) PAPARAZZI_HOME=$(PAPARAZZI_HOME) $(TOOLS)/gen_mtk.out $< > /tmp/mtk.h
 	$(Q)mv /tmp/mtk.h $@
 
+$(SIRF_PROTOCOL_H) : $(SIRF_XML) tools
+	@echo BUILD $@
+	$(Q)PAPARAZZI_SRC=$(PAPARAZZI_SRC) PAPARAZZI_HOME=$(PAPARAZZI_HOME) $(TOOLS)/gen_sirf.out $< > /tmp/sirf.h
+	$(Q)mv /tmp/sirf.h $@
+
 $(XSENS_PROTOCOL_H) : $(XSENS_XML) tools
 	@echo BUILD $@
 	$(Q)PAPARAZZI_SRC=$(PAPARAZZI_SRC) PAPARAZZI_HOME=$(PAPARAZZI_HOME) $(TOOLS)/gen_xsens.out $< > /tmp/xsens.h
@@ -189,6 +197,8 @@ $(ABI_MESSAGES_H) : $(MESSAGES_XML) tools
 	@echo BUILD $@
 	$(Q)PAPARAZZI_SRC=$(PAPARAZZI_SRC) PAPARAZZI_HOME=$(PAPARAZZI_HOME) $(TOOLS)/gen_abi.out $< airborne > /tmp/abi.h
 	$(Q)mv /tmp/abi.h $@
+
+
 
 
 include Makefile.ac

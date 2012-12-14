@@ -30,7 +30,7 @@
     <field name="CH12PRN" format="U1"/>
   </message>
 
-  <message name="GEO" ID="0x29"/>
+  <message name="GEO" ID="0x29">
     <field name="NAVValid" format="I2"/>             <!-- not the right format but don't intend to use it -->
     <field name="NAVType" format="I2"/>              <!-- not the right format but don't intend to use it -->
     <field name="week" format="U2"/>
