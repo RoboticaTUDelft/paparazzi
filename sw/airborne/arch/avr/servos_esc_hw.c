@@ -36,11 +36,8 @@
 #include "servos_esc_hw.h"
 #include CONFIG
 
-#include <stdio.h>
-
 
 void actuators_init ( void ) {
-	printf("SERVOS ESC_HW");
   /* OC1A output    */
   DDRB |= _BV(5);
   /* fast PWM, 10 bits */

@@ -7,6 +7,7 @@
 
 #include "subsystems/imu.h"
 #include "generated/airframe.h"
+//FIXME: set correct location and file name
 #include "navdata.h"
 
 int imu_data_available;

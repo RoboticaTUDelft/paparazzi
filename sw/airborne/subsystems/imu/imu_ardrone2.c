@@ -5,16 +5,15 @@
 #include "subsystems/imu.h"
 #include "navdata.h"
 
+//temp
+#include <stdio.h>
+
 void imu_impl_init(void) {
   imu_data_available = FALSE;
 }
 
-/*
- * Checks periodicly if the navdata countains new sensor values.
- * If it does it sets the gyro, acc and mag vectors and
- * tells the AHRS (indirectly) that the data is available
- */
 void imu_periodic(void) {
+  //checks if the navboard has a new dataset ready
 	if (navdata_check == 0){
 		RATES_ASSIGN(imu.gyro_unscaled, navdata->vx, navdata->vy, navdata->vz);
 		VECT3_ASSIGN(imu.accel_unscaled, navdata->ax, navdata->ay, navdata->az);

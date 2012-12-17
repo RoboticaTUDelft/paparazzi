@@ -9,10 +9,7 @@
 #include "actuators.h"
 #include "generated/airframe.h"
 
-#include <stdio.h>
-
 void actuators_init ( void ) {
-  printf("SERVOS DIRECT_HW");
  /* OC3A, OC3B, OC3C outputs    */
   DDRE |= _BV(3) | _BV(4) | _BV(5);
   /* set timer3 in fast PWM mode, with TOP defined by ICR3 , prescaled to 8 */
