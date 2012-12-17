@@ -56,7 +56,7 @@ void wifi_receive( void ) {
 	}*/
 
 	// TODO: fix argument 2 incompatible pointer type
-	network_read(network, &udp_read_buffer, TRANSPORT_PAYLOAD_LEN);
+	network_read(network, udp_read_buffer, TRANSPORT_PAYLOAD_LEN);
 
 	if (udp_read_buffer[0] == STX) {
 

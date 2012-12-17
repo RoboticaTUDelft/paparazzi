@@ -186,6 +186,9 @@ else ifeq ($(ARCH), omap_ardrone2)
 #ap.srcs   += $(SRC_ARCH)/mcu_periph/adc_arch.c
 #ap.srcs   += subsystems/electrical.c
 ap.srcs   += $(SRC_ARCH)/subsystems/electrical/electrical_arch.c
+ap.srcs   += $(SRC_BOARD)/vbat.c
+ap.srcs   += $(SRC_BOARD)/navdata.c
+ap.CFLAGS +=-DARDRONE2
 endif
 
 
@@ -249,7 +252,4 @@ SRC_FMS=fms
 ap.CFLAGS += -I. -I$(SRC_FMS)
 ap.srcs   += $(SRC_FMS)/fms_serial_port.c
 endif
-
-ap.CFLAGS +=-DARDRONE2
-ap.srcs   += $(SRC_BOARD)/navdata.c
 
