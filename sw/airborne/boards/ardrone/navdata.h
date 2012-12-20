@@ -10,11 +10,6 @@
 
 #include <stdint.h>
 
-// u64 = uint64_t
-// u32 = uint32_t
-// u16 = uint16_t
-// u08 = uint8_t
-
 typedef struct {
 	uint8_t buffer[120];
 	int bufferSize;
@@ -68,6 +63,7 @@ typedef struct
 
 measures_t* navdata;
 uint16_t navdata_check;
+uint16_t navdata_cks;
 
 int navdata_init(void);
 void navdata_close(void);

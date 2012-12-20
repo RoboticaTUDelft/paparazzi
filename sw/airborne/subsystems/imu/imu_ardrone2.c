@@ -4,6 +4,7 @@
 
 #include "subsystems/imu.h"
 #include "navdata.h"
+#include "imu_ardrone2.h"
 
 //temp
 #include <stdio.h>

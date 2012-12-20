@@ -50,7 +50,7 @@ void uart_periph_set_baudrate(struct uart_periph* p, uint32_t baud, bool_t hw_fl
 	tio.c_iflag= IGNBRK;
 	tio.c_oflag= 0;
 	tio.c_cflag= CS8 | CLOCAL | CREAD;
-	tio.c_cflag|= B9600;
+	tio.c_cflag|= B57600;
 	tio.c_lflag= 0;
 	tio.c_cc[VTIME]= 0;
 	tio.c_cc[VMIN]= 1;

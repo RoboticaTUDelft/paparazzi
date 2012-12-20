@@ -18,6 +18,8 @@ unsigned int nextReadSize;
 short int navdata_writeToBlock;
 int debug;
 
+#define NAVDATA_MAX_READSIZE 120
+
 raw_navdata rn;
 raw_navdata* rn_ptr;
 
@@ -60,7 +62,7 @@ int navdata_init()
 		rn.block[i] = 0;
 	}
 
-	for (int i = 0; i < 120; i++){
+	for (int i = 0; i < NAVDATA_MAX_READSIZE; i++){
 		rn.buffer[i] = 0;
 	}
 
@@ -68,12 +70,14 @@ int navdata_init()
 	rn.bufferSize = 0;
 
 	rn_ptr = &rn;
-	nextReadSize = 120;
+	nextReadSize = NAVDATA_MAX_READSIZE;
 
 	navdata = (measures_t*) &(rn.block);
 	navdata_check = 0;
 
 	debug = 0;
+
+	navdata_cks = 0;
 
 	return 0;
 }
@@ -87,11 +91,13 @@ void navdata_readFromBuffer(raw_navdata* ptr)
 {
 	if(navdata_writeToBlock == 0){
 		for (int i = 0; i < ptr->bufferSize; i++){
-			if (ptr->buffer[i] == 0x3a){
-				ptr->blockIndex = i;
-				navdata_writeToBlock = 1;
-				navdata_fill_block(ptr);
-				break;
+			if (ptr->buffer[i] == 0x3a && (ptr->bufferSize - i) > 1) {
+					if (ptr->buffer[i+1] == 0x0) {
+						ptr->blockIndex = i;
+						navdata_writeToBlock = 1;
+						navdata_fill_block(ptr);
+						break;
+					}
 			}
 		}
 	}
@@ -120,13 +126,13 @@ void navdata_read_once()
 			}
 			printf("\n");
 		}
-		nextReadSize = 120;
+		nextReadSize = NAVDATA_MAX_READSIZE;
 		rn_ptr->blockIndex = 0;
 	}
 
 	else {
 		// when a composed block is fully read, reset the nextReadSize
-		nextReadSize = 120;
+		nextReadSize = NAVDATA_MAX_READSIZE;
 		rn_ptr->blockIndex = 0;
 
 //		printf("Error: nextReadSize < 0");
@@ -151,33 +157,35 @@ void navdata_event(void (* _navdata_handler)(void)){
 
 uint16_t navdata_checksum()
 {
-	uint16_t checksum = 0;
-	checksum += navdata->nu_trame;
-	checksum += navdata->ax;
-	checksum += navdata->ay;
-	checksum += navdata->az;
-	checksum += navdata->vx;
-	checksum += navdata->vy;
-	checksum += navdata->vz;
-	checksum += navdata->temperature_acc;
-	checksum += navdata->temperature_gyro;
-	checksum += navdata->ultrasound;
-	checksum += navdata->us_debut_echo;
-	checksum += navdata->us_fin_echo;
-	checksum += navdata->us_association_echo;
-	checksum += navdata->us_distance_echo;
-	checksum += navdata->us_curve_time;
-	checksum += navdata->us_curve_value;
-	checksum += navdata->us_curve_ref;
-	checksum += navdata->nb_echo;
-	checksum += navdata->sum_echo;
-	checksum += navdata->gradient;
-	checksum += navdata->flag_echo_ini;
-	checksum += navdata->pressure;
-	checksum += navdata->temperature_pressure;
-	checksum += navdata->mx;
-	checksum += navdata->my;
-	checksum += navdata->mz;
+	navdata_cks = 0;
+	navdata_cks += navdata->nu_trame;
+	navdata_cks += navdata->ax;
+	navdata_cks += navdata->ay;
+	navdata_cks += navdata->az;
+	navdata_cks += navdata->vx;
+	navdata_cks += navdata->vy;
+	navdata_cks += navdata->vz;
+	navdata_cks += navdata->temperature_acc;
+	navdata_cks += navdata->temperature_gyro;
+	navdata_cks += navdata->ultrasound;
+	navdata_cks += navdata->us_debut_echo;
+	navdata_cks += navdata->us_fin_echo;
+	navdata_cks += navdata->us_association_echo;
+	navdata_cks += navdata->us_distance_echo;
+	navdata_cks += navdata->us_curve_time;
+	navdata_cks += navdata->us_curve_value;
+	navdata_cks += navdata->us_curve_ref;
+	navdata_cks += navdata->nb_echo;
+	navdata_cks += navdata->sum_echo;
+	navdata_cks += navdata->gradient;
+	navdata_cks += navdata->flag_echo_ini;
+	navdata_cks += navdata->pressure;
+	navdata_cks += navdata->temperature_pressure;
+	navdata_cks += navdata->mx;
+	navdata_cks += navdata->my;
+	navdata_cks += navdata->mz;
 
-	return abs(navdata->chksum - checksum);
+	return 0;
+
+	return abs(navdata->chksum - navdata_cks);
 }
