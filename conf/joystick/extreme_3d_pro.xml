@@ -43,6 +43,7 @@ The "mode" button swaps the axes on the left stick and the d pad.
    <field name="roll" value="lx"/>
    <field name="yaw" value="rx"/>
    <field name="pitch" value="ly"/>
+   <field name="mode" value="0"/>
   </message>
 
 

@@ -17,7 +17,7 @@
 			<subsystem name="radio_control" type="ppm"/>
 		</target>
 
-		<!-- <define name="LOW_NOISE_THRESHOLD" value="20000000" /> -->
+		<!-- <define name="LOW_NOISE_THRESHOLD" value="220000000" /> -->
 		
 		<subsystem name="motor_mixing" />
 
@@ -45,10 +45,10 @@
 	</commands>
 
 	<servos driver="Pwm">
-		<servo name="TOP_RIGHT" no="0" min="1000" neutral="1100" max="1900" />
-		<servo name="BOTTOM_LEFT" no="1" min="1000" neutral="1100" max="1900" />
-		<servo name="BOTTOM_RIGHT" no="2" min="1000" neutral="1100" max="1900" />
-		<servo name="TOP_LEFT" no="3" min="1000" neutral="1100" max="1900" />
+		<servo name="TOP_RIGHT" no="0" min="0" neutral="0" max="512" />
+		<servo name="BOTTOM_LEFT" no="1" min="0" neutral="0" max="512" />
+		<servo name="BOTTOM_RIGHT" no="2" min="0" neutral="0" max="512" />
+		<servo name="TOP_LEFT" no="3" min="0" neutral="0" max="512" />
 	</servos>
 
 	<section name="MIXING" prefix="MOTOR_MIXING_">
@@ -73,7 +73,21 @@
 	</command_laws>
 
 	<section name="IMU" prefix="IMU_">
-		<define name="ACCEL_X_NEUTRAL" value="2068" />
+		<!-- <define name="ACCEL_X_NEUTRAL" value="37376" />
+		<define name="ACCEL_Y_NEUTRAL" value="70" />
+		<define name="ACCEL_Z_NEUTRAL" value="28160" />
+		<define name="ACCEL_X_SENS" value="358.765714286" integer="16" />
+		<define name="ACCEL_Y_SENS" value="358.765714286" integer="16" />
+		<define name="ACCEL_Z_SENS" value="358.765714286" integer="16" /> -->
+		
+		<define name="ACCEL_X_NEUTRAL" value="2046" />
+		<define name="ACCEL_Y_NEUTRAL" value="2037" />
+		<define name="ACCEL_Z_NEUTRAL" value="2019" />
+		<define name="ACCEL_X_SENS" value="19.8665118727" integer="16" />
+		<define name="ACCEL_Y_SENS" value="19.4211675843" integer="16" />
+		<define name="ACCEL_Z_SENS" value="19.7932766787" integer="16" />
+		
+<!-- 		<define name="ACCEL_X_NEUTRAL" value="2068" />
 		<define name="ACCEL_Y_NEUTRAL" value="2036" />
 		<define name="ACCEL_Z_NEUTRAL" value="2540" />
 
@@ -84,7 +98,7 @@
 		<define name="ACCEL_Y_SENS_DEN" value="1000" />
 
 		<define name="ACCEL_Z_SENS_NUM" value="4905" />
-		<define name="ACCEL_Z_SENS_DEN" value="1000" />
+		<define name="ACCEL_Z_SENS_DEN" value="1000" /> -->
 
 		<define name="MAG_X_SIGN" value="1" />
 		<define name="MAG_Y_SIGN" value="1" />
@@ -235,7 +249,7 @@
 	</section>
 
 	<section name="AUTOPILOT">
-		<define name="MODE_MANUAL" value="AP_MODE_ATTITUDE_DIRECT" />
+		<define name="MODE_MANUAL" value="AP_MODE_RC_DIRECT" />
 		<define name="MODE_AUTO1" value="AP_MODE_ATTITUDE_Z_HOLD" />
 		<define name="MODE_AUTO2" value="AP_MODE_HOVER_Z_HOLD" />
 	</section>

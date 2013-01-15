@@ -67,6 +67,7 @@ uint16_t navdata_cks;
 
 int navdata_init(void);
 void navdata_close(void);
+void navdata_appendBuffer(raw_navdata* ptr);
 void navdata_readFromBuffer(raw_navdata* ptr);
 void navdata_read_once(void);
 void navdata_setMeasurements(void);

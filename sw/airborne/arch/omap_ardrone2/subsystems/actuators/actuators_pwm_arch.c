@@ -32,9 +32,10 @@
 #include "motorboard.h"
 #include "gpio.h"
 
-int mot_fd;
-
 void actuators_pwm_arch_init(void) {
 	motorboard_Init();
 }
 
+void actuators_pwm_commit(void) {
+	motorboard_SetPWM(actuators_pwm_values[0], actuators_pwm_values[1], actuators_pwm_values[2], actuators_pwm_values[3]);
+}

@@ -13,10 +13,8 @@
 #include "navdata.h"
 
 int nav_fd;
-int navdata_parced;
 unsigned int nextReadSize;
 short int navdata_writeToBlock;
-int debug;
 
 #define NAVDATA_MAX_READSIZE 120
 
@@ -75,8 +73,6 @@ int navdata_init()
 	navdata = (measures_t*) &(rn.block);
 	navdata_check = 0;
 
-	debug = 0;
-
 	navdata_cks = 0;
 
 	return 0;
@@ -89,18 +85,29 @@ void navdata_close()
 
 void navdata_readFromBuffer(raw_navdata* ptr)
 {
-	if(navdata_writeToBlock == 0){
-		for (int i = 0; i < ptr->bufferSize; i++){
-			if (ptr->buffer[i] == 0x3a && (ptr->bufferSize - i) > 1) {
-					if (ptr->buffer[i+1] == 0x0) {
-						ptr->blockIndex = i;
-						navdata_writeToBlock = 1;
-						navdata_fill_block(ptr);
-						break;
-					}
-			}
+	for (int i = 0; i < ptr->bufferSize; i++){
+		if (ptr->buffer[i] == 0x3a && (ptr->bufferSize - i) > 1) {
+				if (ptr->buffer[i+1] == 0x0) {
+					ptr->blockIndex = i;
+					navdata_fill_block(ptr);
+					break;
+				}
 		}
 	}
+}
+
+void navdata_appendBuffer(raw_navdata* ptr)
+{
+	int i;
+
+	if ((ptr->blockIndex + ptr->bufferSize) <= 60) {
+		for(i = 0; i < ptr->bufferSize; i++)
+		{
+			ptr->block[ptr->blockIndex++] = ptr->buffer[i];
+		}
+	}/* else {
+		printf("blockIndex=%d, bufferSize=%d, sum=%d\n", ptr->blockIndex, ptr->bufferSize, (ptr->blockIndex + ptr->bufferSize));
+	}*/
 }
 
 void navdata_read_once()
@@ -108,55 +115,53 @@ void navdata_read_once()
 	rn_ptr->bufferSize = read(nav_fd, rn_ptr->buffer, nextReadSize);
 //	printf("Read %d bytes. Next read size: %d bytes.\n", rn_ptr->bufferSize, (nextReadSize - rn_ptr->bufferSize));
 
-	nextReadSize -= rn_ptr->bufferSize;
+	if (rn_ptr->bufferSize > 0) {
+		nextReadSize -= rn_ptr->bufferSize;
+		navdata_appendBuffer(rn_ptr);
+	}
 
 	// if we read a buffer smaller than or equal to 60 bytes
 	if (nextReadSize > 0) {
-//		printf("Buffer not filled completely\n");
+//		printf("Buffer not filled completely, last read %d bytes\n", rn_ptr->bufferSize);
 	}
-
 	// if we have gathered a full block
 	else if (nextReadSize == 0) {
 		navdata_readFromBuffer(rn_ptr);
 
 		// the 60 byte block has to start with 0x3a (dec:58)
-		if (debug == 1){
+		if (0) {
 			for (int bi = 0; bi < 60; bi++) {
-//				printf("%02X ", rn_ptr->block[bi]);
+				printf("%02X ", rn_ptr->block[bi]);
 			}
 			printf("\n");
 		}
 		nextReadSize = NAVDATA_MAX_READSIZE;
 		rn_ptr->blockIndex = 0;
 	}
-
 	else {
+		printf("Else...");
 		// when a composed block is fully read, reset the nextReadSize
 		nextReadSize = NAVDATA_MAX_READSIZE;
 		rn_ptr->blockIndex = 0;
-
-//		printf("Error: nextReadSize < 0");
 	}
 }
 
-void navdata_fill_block(raw_navdata* nfb_ptr){
-	for (int i = 0; i < 60; i++){
+void navdata_fill_block(raw_navdata* nfb_ptr) {
+	for (int i = 0; i < 60; i++) {
 		nfb_ptr->block[i] = nfb_ptr->buffer[nfb_ptr->blockIndex + i];
 	}
-
-	navdata_writeToBlock = 0;
 }
 
 void navdata_setMeasurements() {
 	navdata_check = navdata_checksum();
+//	printf("checksum = %d\n", navdata_check);
 }
 
-void navdata_event(void (* _navdata_handler)(void)){
+void navdata_event(void (* _navdata_handler)(void)) {
 	_navdata_handler();
 }
 
-uint16_t navdata_checksum()
-{
+uint16_t navdata_checksum() {
 	navdata_cks = 0;
 	navdata_cks += navdata->nu_trame;
 	navdata_cks += navdata->ax;
@@ -184,8 +189,6 @@ uint16_t navdata_checksum()
 	navdata_cks += navdata->mx;
 	navdata_cks += navdata->my;
 	navdata_cks += navdata->mz;
-
-	return 0;
 
 	return abs(navdata->chksum - navdata_cks);
 }
