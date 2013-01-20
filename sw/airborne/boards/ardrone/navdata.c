@@ -13,21 +13,19 @@
 #include "navdata.h"
 
 int nav_fd;
-unsigned int nextReadSize;
 short int navdata_writeToBlock;
-
-#define NAVDATA_MAX_READSIZE 120
-
-raw_navdata rn;
-raw_navdata* rn_ptr;
 
 int navdata_init()
 {
+	port = malloc(sizeof(navdata_port));
+
 	nav_fd = open("/dev/ttyO1", O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (nav_fd == -1)
 	{
 		perror("navdata_init: Unable to open /dev/ttyO1 - ");
 		return 1;
+	} else {
+		port->isOpen = 1;
 	}
 
 	fcntl(nav_fd, F_SETFL, 0); //read calls are non blocking
@@ -55,109 +53,100 @@ int navdata_init()
 	cmd=0x01;
 	write(nav_fd, &cmd, 1);
 
-	// initialize buffers
-	for (int i = 0; i < 60; i++) {
-		rn.block[i] = 0;
-	}
+	navdata = malloc(sizeof(measures_t));
+	navdata_imu_available = 0;
+	navdata_baro_available = 0;
 
-	for (int i = 0; i < NAVDATA_MAX_READSIZE; i++){
-		rn.buffer[i] = 0;
-	}
-
-	rn.blockIndex = 0;
-	rn.bufferSize = 0;
-
-	rn_ptr = &rn;
-	nextReadSize = NAVDATA_MAX_READSIZE;
-
-	navdata = (measures_t*) &(rn.block);
-	navdata_check = 0;
-
-	navdata_cks = 0;
+	port->bytesRead = 0;
+	port->totalBytesRead = 0;
+	port->packetsRead = 0;
+	port->isInitialized = 1;
 
 	return 0;
 }
 
 void navdata_close()
 {
+	port->isOpen = 0;
 	close(nav_fd);
 }
 
-void navdata_readFromBuffer(raw_navdata* ptr)
+void navdata_read()
 {
-	for (int i = 0; i < ptr->bufferSize; i++){
-		if (ptr->buffer[i] == 0x3a && (ptr->bufferSize - i) > 1) {
-				if (ptr->buffer[i+1] == 0x0) {
-					ptr->blockIndex = i;
-					navdata_fill_block(ptr);
-					break;
-				}
-		}
+	int newbytes = 0;
+
+	if (port->isInitialized != 1)
+		navdata_init();
+
+	if (port->isOpen != 1)
+		return;
+
+	newbytes = read(nav_fd, port->buffer+port->bytesRead, NAVDATA_BUFFER_SIZE-port->bytesRead);
+
+	// because non-blocking read returns -1 when no bytes available
+	if (newbytes > 0)
+	{
+		port->bytesRead += newbytes;
+		port->totalBytesRead += newbytes;
+
+//		printf("NewBytes: %d\n", newbytes);
+//		printf("BytesRead: %d\n", port->bytesRead);
+//		printf("TotalBytesRead: %d\n", port->totalBytesRead);
 	}
+
 }
 
-void navdata_appendBuffer(raw_navdata* ptr)
+void navdata_update()
 {
-	int i;
+	navdata_read();
 
-	if ((ptr->blockIndex + ptr->bufferSize) <= 60) {
-		for(i = 0; i < ptr->bufferSize; i++)
+	// while there is something interesting to do...
+	while (port->bytesRead >= 60)
+	{
+		if (port->buffer[0] == NAVDATA_START_BYTE)
 		{
-			ptr->block[ptr->blockIndex++] = ptr->buffer[i];
-		}
-	}/* else {
-		printf("blockIndex=%d, bufferSize=%d, sum=%d\n", ptr->blockIndex, ptr->bufferSize, (ptr->blockIndex + ptr->bufferSize));
-	}*/
-}
-
-void navdata_read_once()
-{
-	rn_ptr->bufferSize = read(nav_fd, rn_ptr->buffer, nextReadSize);
-//	printf("Read %d bytes. Next read size: %d bytes.\n", rn_ptr->bufferSize, (nextReadSize - rn_ptr->bufferSize));
-
-	if (rn_ptr->bufferSize > 0) {
-		nextReadSize -= rn_ptr->bufferSize;
-		navdata_appendBuffer(rn_ptr);
-	}
-
-	// if we read a buffer smaller than or equal to 60 bytes
-	if (nextReadSize > 0) {
-//		printf("Buffer not filled completely, last read %d bytes\n", rn_ptr->bufferSize);
-	}
-	// if we have gathered a full block
-	else if (nextReadSize == 0) {
-		navdata_readFromBuffer(rn_ptr);
-
-		// the 60 byte block has to start with 0x3a (dec:58)
-		if (0) {
-			for (int bi = 0; bi < 60; bi++) {
-				printf("%02X ", rn_ptr->block[bi]);
+			// if checksum is OK
+			if ( 1 ) // we dont know how to calculate the checksum
+//			if ( navdata_checksum() == 0 )
+			{
+				memcpy(navdata, port->buffer, NAVDATA_PACKET_SIZE);
+				navdata_imu_available = 1;
+				navdata_baro_available = 1;
+				port->packetsRead++;
+//				printf("CCRC=%d, GCRC=%d, error=%d\n", crc, navdata->chksum, abs(crc-navdata->chksum));
 			}
-			printf("\n");
+			navdata_CropBuffer(60);
 		}
-		nextReadSize = NAVDATA_MAX_READSIZE;
-		rn_ptr->blockIndex = 0;
-	}
-	else {
-		printf("Else...");
-		// when a composed block is fully read, reset the nextReadSize
-		nextReadSize = NAVDATA_MAX_READSIZE;
-		rn_ptr->blockIndex = 0;
+		else
+		{
+			// find start byte, copy all data from startbyte to buffer origin, update bytesread
+			uint8_t * pint;
+			pint = memchr(port->buffer, NAVDATA_START_BYTE, port->bytesRead);
+
+			if (pint != NULL) {
+				port->bytesRead -= pint - port->buffer;
+				navdata_CropBuffer(pint - port->buffer);
+			} else {
+				// if the start byte was not found, it means there is junk in the buffer
+				port->bytesRead = 0;
+			}
+		}
 	}
 }
 
-void navdata_fill_block(raw_navdata* nfb_ptr) {
-	for (int i = 0; i < 60; i++) {
-		nfb_ptr->block[i] = nfb_ptr->buffer[nfb_ptr->blockIndex + i];
+void navdata_CropBuffer(int cropsize)
+{
+	if (port->bytesRead - cropsize < 0) {
+		printf("BytesRead - Cropsize may not be below zero...");
+		return;
 	}
-}
 
-void navdata_setMeasurements() {
-	navdata_check = navdata_checksum();
-//	printf("checksum = %d\n", navdata_check);
+	memmove(port->buffer, port->buffer+cropsize, NAVDATA_BUFFER_SIZE-cropsize);
+	port->bytesRead -= cropsize;
 }
 
 void navdata_event(void (* _navdata_handler)(void)) {
+	navdata_update();
 	_navdata_handler();
 }
 
@@ -189,6 +178,8 @@ uint16_t navdata_checksum() {
 	navdata_cks += navdata->mx;
 	navdata_cks += navdata->my;
 	navdata_cks += navdata->mz;
+//	navdata_cks += navdata->chksum;
 
-	return abs(navdata->chksum - navdata_cks);
+	return 0; // we dont know how to calculate the checksum
+//	return abs(navdata->chksum - navdata_cks);
 }

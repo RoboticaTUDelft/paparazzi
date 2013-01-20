@@ -10,69 +10,77 @@
 
 #include <stdint.h>
 
+#define NAVDATA_PACKET_SIZE 60
+#define NAVDATA_BUFFER_SIZE 80
+#define NAVDATA_START_BYTE 0x3a
+
 typedef struct {
-	uint8_t buffer[120];
-	int bufferSize;
-	uint8_t block[60];
-	int blockIndex;
-} raw_navdata;
+	uint8_t isInitialized;
+	uint8_t isOpen;
+	uint16_t bytesRead;
+	uint32_t totalBytesRead;
+	uint32_t packetsRead;
+	uint8_t buffer[NAVDATA_BUFFER_SIZE];
+} navdata_port;
 
 typedef struct
 {
-  unsigned short taille;
-  unsigned short nu_trame;
+  uint16_t taille;
+  uint16_t nu_trame;
 
-  unsigned short ax;
-  unsigned short ay;
-  unsigned short az;
+  uint16_t ax;
+  uint16_t ay;
+  uint16_t az;
 
-  unsigned short vx;
-  unsigned short vy;
-  unsigned short vz;
-  unsigned short temperature_acc;
-  unsigned short temperature_gyro;
+  int16_t vx;
+  int16_t vy;
+  int16_t vz;
+  uint16_t temperature_acc;
+  uint16_t temperature_gyro;
 
-  unsigned short ultrasound;
+  uint16_t ultrasound;
 
-  unsigned short us_debut_echo;
-  unsigned short us_fin_echo;
-  unsigned short us_association_echo;
-  unsigned short us_distance_echo;
+  uint16_t us_debut_echo;
+  uint16_t us_fin_echo;
+  uint16_t us_association_echo;
+  uint16_t us_distance_echo;
 
-  unsigned short us_curve_time;
-  unsigned short us_curve_value;
-  unsigned short us_curve_ref;
+  uint16_t us_curve_time;
+  uint16_t us_curve_value;
+  uint16_t us_curve_ref;
 
-  unsigned short nb_echo;
+  uint16_t nb_echo;
 
-  unsigned long  sum_echo;
-  short gradient;
+  uint32_t sum_echo; //unsigned long
+  int16_t gradient;
 
-  unsigned short flag_echo_ini;
+  uint16_t flag_echo_ini;
 
-  long pressure;
-  short temperature_pressure;
+  int32_t pressure; //long
+  int16_t temperature_pressure;
 
-  short mx;
-  short my;
-  short mz;
+  int16_t mx;
+  int16_t my;
+  int16_t mz;
 
-  unsigned short chksum;
+  uint16_t chksum;
 
 } __attribute__ ((packed)) measures_t;
 
 measures_t* navdata;
-uint16_t navdata_check;
+navdata_port* port;
 uint16_t navdata_cks;
+uint8_t navdata_imu_available;
+uint8_t navdata_baro_available;
 
 int navdata_init(void);
 void navdata_close(void);
-void navdata_appendBuffer(raw_navdata* ptr);
-void navdata_readFromBuffer(raw_navdata* ptr);
-void navdata_read_once(void);
-void navdata_setMeasurements(void);
+
+void navdata_read(void);
+void navdata_update(void);
+void navdata_CropBuffer(int cropsize);
+
 uint16_t navdata_checksum(void);
-void navdata_fill_block(raw_navdata* nfb_ptr);
 
 void navdata_event(void (* _navdata_handler)(void));
 
