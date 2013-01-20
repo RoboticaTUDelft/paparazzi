@@ -68,6 +68,7 @@
 
 #if ARDRONE2
 #include "navdata.h"
+#include <stdio.h>
 #endif
 
 static inline void on_gyro_event( void );
@@ -91,6 +92,13 @@ tid_t navdata_tid;
 
 #ifndef SITL
 int main( void ) {
+
+#if ARDRONE2
+	printf("Kill Parrot's program.elf! \n");
+	int rc = system("/usr/bin/killall program.elf > /dev/null 2>&1");
+	printf("killall program.elf => returncode=%d  (0=killed,256=not found)\n",rc);
+#endif
+
 	main_init();
 	while(1) {
 		handle_periodic_tasks();
@@ -210,7 +218,6 @@ STATIC_INLINE void telemetry_periodic(void) {
 
 #if ARDRONE2
 STATIC_INLINE void navdata_periodic(void){
-  navdata_read_once();
 }
 #endif
 
@@ -333,6 +340,8 @@ static inline void on_mag_event(void) {
 
 #if ARDRONE2
 static inline void on_navdata_event(void) {
-	navdata_setMeasurements();
+	// when executing here, navdata is done reading...
+	// what should happen now? update IMU?
+	// notify navdata available?
 }
 #endif
