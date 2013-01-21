@@ -28,6 +28,7 @@
 #ifndef SYS_TIME_ARCH_H
 #define SYS_TIME_ARCH_H
 
+#include "mcu_periph/sys_time.h"
 #include "std.h"
 
 extern void sys_tick_handler(int signum);

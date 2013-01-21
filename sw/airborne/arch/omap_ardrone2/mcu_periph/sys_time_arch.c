@@ -20,7 +20,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include "mcu_periph/sys_time.h"
 #include <sys/time.h>
 #include <signal.h>
 #include <string.h>
