@@ -21,6 +21,7 @@
 *.aux
 
 # Eclipse IDE project files
+*.preferences.xml
 *.cproject
 *.project
 *.externalToolBuilders

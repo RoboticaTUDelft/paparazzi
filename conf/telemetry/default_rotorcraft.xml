@@ -52,8 +52,8 @@
       <message name="ALIVE"              period="2.1"/>
 <!--      <message name="FILTER_ALIGNER"     period=".1"/> -->
       <message name="FILTER"             period=".5"/>
-<!--      <message name="AHRS_QUAT_INT"   period=".25"/> -->
-      <message name="AHRS_EULER_INT"     period=".1"/>
+      <message name="AHRS_QUAT_INT"   period=".25"/>
+<!--      <message name="AHRS_EULER_INT"     period=".1"/> -->
 <!--      <message name="AHRS_RMAT_INT"   period=".5"/> -->
     </mode>
 
