@@ -69,7 +69,8 @@ CXXFLAGS = -pipe -O3 -fshow-column -ffast-math -fPIC
 CXXFLAGS += -g -ffunction-sections -fdata-sections
 CXXFLAGS += -mfloat-abi=softfp -mtune=cortex-a8 -mfpu=vfp -march=armv7-a
 CXXFLAGS += -Wall -Wextra
-CXXFLAGS += $($(TARGET).CXXFLAGS)
+CXXFLAGS += $(CINCS)
+CXXFLAGS += $($(TARGET).CFLAGS)
 
 
 SRC_C_OMAP  = $($(TARGET).srcs)
@@ -121,8 +122,16 @@ $(OBJDIR)/.depend:
 	@test -d $(OBJDIR) || mkdir -p $(OBJDIR)
 	$(Q)$(CC) -MM -MG $(CFLAGS) $($(TARGET).CFLAGS) $($(TARGET).srcs) | sed 's|\([^\.]*\.o\)|$(OBJDIR)/\1|' > $@
 
+$(OBJDIR)/.dependcpp:
+	@echo DEPENDCPP $@
+	@test -d $(OBJDIR) || mkdir -p $(OBJDIR)
+	$(Q)$(CXX) -MM -MG $(CXXFLAGS) $($(TARGET).CXXFLAGS) $($(TARGET).cpp_srcs) | sed 's|\([^\.]*\.o\)|$(OBJDIR)/\1|' > $@
+
+
+
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),erase)
 -include $(OBJDIR)/.depend
+-include $(OBJDIR)/.dependcpp
 endif
 endif
