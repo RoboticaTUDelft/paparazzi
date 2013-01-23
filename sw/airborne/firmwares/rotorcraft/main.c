@@ -70,6 +70,10 @@
 #include "navdata.h"
 #endif
 
+#ifdef USE_MAPPING
+#include "subsystems/mapping.h"
+#endif
+
 static inline void on_gyro_event( void );
 static inline void on_accel_event( void );
 static inline void on_baro_abs_event( void );
@@ -87,6 +91,9 @@ tid_t electrical_tid;    ///< id for electrical_periodic() timer
 tid_t baro_tid;          ///< id for baro_periodic() timer
 tid_t telemetry_tid;     ///< id for telemetry_periodic() timer
 tid_t navdata_tid;
+#if USE_MAPPING
+tid_t mapping_tid;
+#endif
 
 #ifndef SITL
 int main( void ) {
@@ -103,6 +110,10 @@ STATIC_INLINE void main_init( void ) {
 
 #if ARDRONE2
   navdata_init();
+#endif
+
+#if USE_MAPPING
+  mapping_init();
 #endif
 
   mcu_init();
@@ -166,6 +177,9 @@ STATIC_INLINE void main_init( void ) {
 #if ARDRONE2
   navdata_tid = sys_time_register_timer((1./PERIODIC_FREQUENCY), NULL);
 #endif
+#if USE_MAPPING
+  mapping_tid = sys_time_register_timer((1./PERIODIC_FREQUENCY), NULL);
+#endif
 }
 
 STATIC_INLINE void handle_periodic_tasks( void ) {
@@ -187,6 +201,10 @@ STATIC_INLINE void handle_periodic_tasks( void ) {
 #if ARDRONE2
   if (sys_time_check_and_ack_timer(navdata_tid))
 	  navdata_periodic();
+#endif
+#if USE_MAPPING
+  if (sys_time_check_and_ack_timer(mapping_tid))
+    mapping_periodic();
 #endif
 }
 
@@ -260,6 +278,10 @@ STATIC_INLINE void main_event( void ) {
 
 #if ARDRONE2
   NavdataEvent(on_navdata_event);
+#endif
+
+#if USE_MAPPING
+  MappingControlEvent(autopilot_on_rc_frame);
 #endif
 
 #if USE_GPS

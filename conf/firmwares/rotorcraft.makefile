@@ -255,3 +255,11 @@ endif
 ap.CFLAGS +=-DARDRONE2
 ap.srcs   += $(SRC_BOARD)/navdata.c
 
+#
+# MAPPING choice
+#
+# include subsystems/rotorcraft/mapping_test.makefile
+# or
+# nothing
+#
+

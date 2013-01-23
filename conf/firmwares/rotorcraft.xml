@@ -24,5 +24,6 @@
  <subsystem name="ahrs"      types="cmpl"/>
  <subsystem name="ins"       types="hff"/>
  <subsystem name="stabilization"       types="euler|quaternion"/>
+ <subsystem name="mapping"   types="test|wrapper"/>
 
 </firmware>

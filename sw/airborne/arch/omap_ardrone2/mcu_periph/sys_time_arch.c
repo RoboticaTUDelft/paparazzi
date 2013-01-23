@@ -23,6 +23,7 @@
 #include <sys/time.h>
 #include <signal.h>
 #include <string.h>
+#include "mcu_periph/sys_time_arch.h"
 
 void sys_time_arch_init( void ) {
 	struct sigaction sa;
