@@ -72,6 +72,10 @@ CXXFLAGS += -Wall -Wextra
 CXXFLAGS += $(CINCS)
 CXXFLAGS += $($(TARGET).CFLAGS)
 
+#info about the drone
+CXXFLAGS += -DSCAN_RANGE=5
+CXXFLAGS += -DVEHICLE_WIDTH=0.5
+
 
 SRC_C_OMAP  = $($(TARGET).srcs)
 OBJ_C_OMAP = $(SRC_C_OMAP:%.c=$(OBJDIR)/%.o)

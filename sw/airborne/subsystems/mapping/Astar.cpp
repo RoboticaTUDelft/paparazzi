@@ -63,8 +63,8 @@ bool Astar::shouldCheck(const tile * current, const tile * t) {
 		p1.x = current->pos.x;
 		p2.y = current->pos.y;
 		p2.x = t->pos.x;
-		tile * corner1 = map->get(&p1);
-		tile * corner2 = map->get(&p2);
+		tile * corner1 = map->get(&p1, 3);
+		tile * corner2 = map->get(&p2, 3);
 		/* cutting corners isn allowed */
 		return (corner1 && !corner1->occupied) && (corner2 && !corner2->occupied);
 	}
@@ -81,7 +81,7 @@ void Astar::checkTile(tile * current) {
 			cur.y = y + current->pos.y;
 			/* not the middle tile */
 			if(x != 0 || y != 0) {
-				tile * t = map->get(&cur);
+				tile * t = map->get(&cur, 3);
 				/* don't pick tiles that are occupied or in the closed list */
 				if(shouldCheck(current, t)) {
 					/* if not yet checked, set the h and g  */

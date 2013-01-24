@@ -14,15 +14,18 @@ class MapPos {
 	point2d pos;
 	int timer;
 	float heading;
-	int prevSpeedx;
-	int prevSpeedy;
+	float prevSpeedx;
+	float prevSpeedy;
 
 public:
 	MapPos();
 
 	void startMoving();
 	void updatePos();
-	void stopMoving();
+	void updateHeading();
+
+	point2d * getPos() { return &pos; }
+	float getHeading() { return heading; }
 };
 
 

@@ -15,7 +15,11 @@ extern "C" {
 Mapping * map;
 
 extern "C" void mapping_init(void) {
-	map = new Mapping (0.2);
+#ifdef VEHICLE_WIDTH
+	map = new Mapping (VEHICLE_WIDTH / 4);
+#else
+	map = new Mapping (0.1);
+#endif
 }
 
 extern "C" void mapping_periodic(void) {

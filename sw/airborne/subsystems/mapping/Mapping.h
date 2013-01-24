@@ -3,6 +3,8 @@
 
 #include "subsystems/mapping/Frontier.h"
 #include "subsystems/mapping/Astar.h"
+#include "subsystems/mapping/MapPos.h"
+#include "std.h"
 #include <list>
 #include <vector>
 
@@ -12,6 +14,12 @@ extern "C" {
 
 class Mapping {
 	Map2D * map;
+	MapPos pos;
+	float goalHeading;
+	float startHeading;
+
+	point2d * startPos;
+
 	int state;
 	unsigned int index;
 	std::list<point2d> frontierPoints;
@@ -19,23 +27,27 @@ class Mapping {
 	std::list<Frontier *>::iterator ifrontiers;
 	std::vector<std::list<tile *> *> paths;
 	std::vector<Frontier *> frontiergrid;
+
+	/* calculates next heading from starting point to destination */
+	void setGoalHeading(const point2d *, const point2d *);
+	/* turns the vehicle, returns true if goalHeading has been reached */
+	bool_t turn();
+
+	bool_t passedGoal(const point2d *, const point2d *);
 public:
 	Mapping () {
 		map = new Map2D (0.5);
 		state = 0;
-		index = 0;
 	}
 
 	Mapping (float resolution) {
 		map = new Map2D (resolution);
 		state = 0;
-		index = 0;
 	}
 
 	Mapping (Map2D * m) {
 		map = m;
 		state = 0;
-		index = 0;
 	}
 
 	/* executes the neccessary functions to complete 1 step in the mapping process */

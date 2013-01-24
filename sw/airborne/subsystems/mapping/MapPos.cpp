@@ -10,7 +10,7 @@
 
 extern "C" {
 #include "mcu_periph/sys_time_arch.h"
-#include "subsystems/ins/ins_int.h"
+#include "state.h"
 }
 
 MapPos::MapPos() {
@@ -22,22 +22,28 @@ MapPos::MapPos() {
 }
 
 void MapPos::startMoving() {
-	prevSpeedx = ins_ltp_speed.x;
-	prevSpeedy = ins_ltp_speed.y;
+	NedCoor_f* speed = stateGetSpeedNed_f();
+
+	prevSpeedx = speed->x;
+	prevSpeedy = speed->y;
 	SysTimeTimerStart(timer);
 }
 
 void MapPos::updatePos() {
-	int speedx;
-	int speedy;
-#if USE_GPS
-	speedx = ins_ltp_speed.x;
-	speedy = ins_ltp_speed.y;
-#else
-	/* accelerometer shit */
-#endif
 	SysTimeTimerStop(timer);
-	pos.x += prevSpeedx * timer + 0.5 * (speedx - prevSpeedx) * timer;
-	pos.y += prevSpeedy * timer + 0.5 * (speedy - prevSpeedy) * timer;
+
+	NedCoor_f* speed = stateGetSpeedNed_f();
+
+	/* integrate speed to estimate position */
+	pos.x += prevSpeedx * timer + 0.5 * (speed->x - prevSpeedx) * timer;
+	pos.y += prevSpeedy * timer + 0.5 * (speed->y - prevSpeedy) * timer;
+	/* reset timer */
 	SysTimeTimerStart(timer);
+	/* set prevSpeed for next integration */
+	prevSpeedx = speed->x;
+	prevSpeedy = speed->y;
+}
+
+void MapPos::updateHeading() {
+	heading = stateGetNedToBodyEulers_f()->psi;
 }

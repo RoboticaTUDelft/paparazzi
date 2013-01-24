@@ -1,29 +1,39 @@
 #include "subsystems/mapping/Mapping.h"
 #include <climits>
+#include <cmath>
 
-//TODO: MapPOs
 //TODO: Travel
 //TODO: Scan
 
 /* exploration states */
-#define SCANNING                   0 
-#define DELETE_FRONTIERS           1
-#define FIND_FRONTIER_NODES        2
-#define BUILD_FRONTIERGRID         3
-#define CLUSTER_FRONTIERS          4
-#define FIND_PATHS                 5
-#define FIND_BEST_FRONTIER         6
-#define TRAVELLING                 7
+#define INIT                       0
+#define SCANNING                   1 
+#define DELETE_FRONTIERS           2
+#define FIND_FRONTIER_NODES        3
+#define BUILD_FRONTIERGRID         4
+#define CLUSTER_FRONTIERS          5
+#define FIND_PATHS                 6
+#define FIND_BEST_FRONTIER         7
+#define TURN_TO_WAYPOINT           8
+#define TRAVEL_TO_WAYPOINT         9
 
 using namespace std;
 
 void Mapping::mappingStep () {
 	std::list<point2d>::iterator i;
 	switch(state) {
-	case SCANNING:
-		/* TODO: scan 360 degrees, add all points to octomap and put them in scannedPoints */
-		state++;
+	case INIT: {
+		index = 0;
+		startHeading = pos.getHeading();
+		goalHeading = startHeading + M_PI_4;	
 		break;
+	}
+	case SCANNING: {
+		if(turn()) {
+			state++;
+		}
+		break;
+	}
 	case DELETE_FRONTIERS: {
 		if(!frontierPoints.empty()) {
 			for(i = frontierPoints.begin(); i != frontierPoints.end(); i++) {
@@ -38,13 +48,17 @@ void Mapping::mappingStep () {
 		break;
 	}
 	case FIND_FRONTIER_NODES: {
-		int j, k;
-		int size = map->getSize();
-		for(j = 0; j < size; j++) {
-			for(k = 0; k < size; k++) {
+#ifdef SCAN_RANGE
+		float scan_range = SCAN_RANGE;
+#else 		
+		float scan_range = 1;
+#endif	
+		float j, k;
+		for(j = -scan_range; j < scan_range; j += map->getResolution()) {
+			for(k = -scan_range; k < scan_range; k += map->getResolution()) {
 				point2d p;
-				p.x = k * map->getResolution();
-				p.y = j * map->getResolution();
+				p.x = pos.getPos()->x + k;
+				p.y = pos.getPos()->y + j;
 				if(isFrontier(&p)) {
 					frontierPoints.push_back(p);
 				}
@@ -90,12 +104,41 @@ void Mapping::mappingStep () {
 	}
 	case FIND_BEST_FRONTIER:
 		index = bestFrontier();
+		if(&(paths[index]->back()->pos) != pos.getPos()) {
+			int j;
+			list<Frontier *>::iterator it;
+			for(j = 0, it = frontiers.begin(); (unsigned) j != index; j++) {
+				it++;
+			}
+			frontiers.erase(it);
+		} else {		
+			setGoalHeading(pos.getPos(), &(paths[index]->front()->pos));
+			state++;
+		}
 		break;
-	case TRAVELLING:
-		/*if(goal == currentPos)
-        state = SCANNING;
-        paths.clear();*/
+	case TURN_TO_WAYPOINT: {
+		if(turn()) {
+			startPos = pos.getPos();
+			state++;
+		}
 		break;
+	}
+	case TRAVEL_TO_WAYPOINT: {
+		point2d goal = paths[index]->front()->pos;
+		if(passedGoal(startPos, &goal)) {
+			mapping_navigation_stop();
+			paths[index]->pop_front();
+			if(paths[index]->empty()) {
+				state = INIT;
+			} else {
+				setGoalHeading(pos.getPos(), &(paths[index]->front()->pos));
+				state--;
+			}
+		} else {
+			mapping_navigation_forward();
+		}
+		break;
+	}
 	}
 }
 
@@ -205,5 +248,53 @@ point2d Mapping::scale(const point2d * p) {
 	scale.x = (p->x - min.x) / map->getResolution();
 	scale.y = (p->y - min.y) / map->getResolution();
 	return scale;
+}
+
+void Mapping::setGoalHeading(const point2d * start, const point2d * destination) {
+	if(start->y != destination->y) {
+		float xdif = destination->x - start->x;
+		float ydif = destination->y - start->y;
+		goalHeading = atan(xdif / ydif);
+	} else if(start->x < destination->x) {
+		goalHeading = M_PI_2;
+	} else goalHeading = M_PI_2 * 3;
+}
+
+bool_t Mapping::turn() {
+	if(goalHeading - startHeading <= M_PI_2) {
+		/* pos.getHeading() will be smaller than startHeading when it has passed the 0 clockwise */
+		float corr = 0;
+		if(pos.getHeading() < startHeading) { 
+			float corr = 2 * M_PI;
+		}
+		/* turn right while haven passed goalHeading */
+		if(pos.getHeading() + corr < goalHeading) {			
+			mapping_navigation_yaw_right();		
+			return false;
+		} else return true;
+	} else {
+		/* pos.getHeading() will be larger than startHeading when it has passed the 0 counter clockwise */
+		float corr = 0;
+		if(pos.getHeading() > startHeading) {
+			float corr = 2 * M_PI;
+		}
+		/* turn right while havent passed goalHeading */
+		if(pos.getHeading() - corr > goalHeading) {
+			mapping_navigation_yaw_left();
+			return false;
+		} else return true;
+	}
+}	
+
+bool_t Mapping::passedGoal(const point2d * start, const point2d * goal) {
+	if(start->x < goal->x) {
+		return pos.getPos()->x >= goal->x;
+	} else if (start->x > goal->x) {
+		return pos.getPos()->x <= goal->x;
+	} else if (start->y < goal->y) {
+		return pos.getPos()->y >= goal->y;
+	} else /* if (start->y > goal->y) */ { 
+		return pos.getPos()->y <= goal->y;
+	}
 }
 
