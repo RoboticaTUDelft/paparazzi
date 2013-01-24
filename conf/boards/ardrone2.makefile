@@ -42,6 +42,9 @@ endif
 #$(TARGET).CFLAGS += -DUART0_DEV=\"/dev/ttyO3\"
 $(TARGET).CFLAGS += -DUART1_DEV=\"/dev/ttyUSB0\"
 
+# for telemetry
+$(TARGET).CFLAGS += -DARDRONE_NAVDATA
+
 # -----------------------------------------------------------------------
 
 # default LED configuration

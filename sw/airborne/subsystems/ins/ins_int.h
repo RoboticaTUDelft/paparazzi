@@ -64,6 +64,7 @@ extern struct FloatVect2 ins_gps_speed_m_s_ned;
 
 /* copy position and speed to state interface */
 #define INS_NED_TO_STATE() {             \
+		ins_ltp_pos.z = ins_gps_pos_cm_ned / INT32_POS_OF_CM_NUM * INT32_POS_OF_CM_DEN; \
   stateSetPositionNed_i(&ins_ltp_pos);   \
   stateSetSpeedNed_i(&ins_ltp_speed);    \
   stateSetAccelNed_i(&ins_ltp_accel);    \

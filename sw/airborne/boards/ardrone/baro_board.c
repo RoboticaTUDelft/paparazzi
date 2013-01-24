@@ -21,7 +21,8 @@ void baro_periodic(void) {
 	baro.status = BS_RUNNING;
 	if(navdata_baro_available == 1) {
 		navdata_baro_available = 0;
-		baro.absolute = navdata->pressure;
+//		baro.absolute = navdata->pressure;
+		baro.absolute = 0;
 		baro_data_available = TRUE;
   }
   else
