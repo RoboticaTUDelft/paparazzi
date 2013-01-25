@@ -10,10 +10,11 @@
 #include <termios.h> 	// for baud rates and options
 #include <unistd.h>
 #include <string.h>
+#include <math.h>
 #include "navdata.h"
 
 int nav_fd;
-short int navdata_writeToBlock;
+//short int navdata_writeToBlock;
 
 int navdata_init()
 {
@@ -61,6 +62,8 @@ int navdata_init()
 	port->totalBytesRead = 0;
 	port->packetsRead = 0;
 	port->isInitialized = 1;
+
+	previousUltrasoundHeight = 0;
 
 	return 0;
 }
@@ -114,6 +117,7 @@ void navdata_update()
 				navdata_baro_available = 1;
 				port->packetsRead++;
 //				printf("CCRC=%d, GCRC=%d, error=%d\n", crc, navdata->chksum, abs(crc-navdata->chksum));
+				navdata_getHeight();
 			}
 			navdata_CropBuffer(60);
 		}
@@ -148,6 +152,24 @@ void navdata_CropBuffer(int cropsize)
 void navdata_event(void (* _navdata_handler)(void)) {
 	navdata_update();
 	_navdata_handler();
+}
+
+int16_t navdata_getHeight() {
+
+	if (navdata->ultrasound > 10000) {
+		return previousUltrasoundHeight;
+	}
+
+	int16_t ultrasoundHeight = 0;
+
+	ultrasoundHeight = (navdata->ultrasound - 880) / 26.553;
+//	ultrasoundHeight /= 100;
+
+//	printf("%d\n", ultrasoundHeight);
+
+	previousUltrasoundHeight = ultrasoundHeight;
+
+	return ultrasoundHeight;
 }
 
 uint16_t navdata_checksum() {

@@ -72,6 +72,7 @@ navdata_port* port;
 uint16_t navdata_cks;
 uint8_t navdata_imu_available;
 uint8_t navdata_baro_available;
+int16_t previousUltrasoundHeight;
 
 int navdata_init(void);
 void navdata_close(void);
@@ -83,6 +84,8 @@ void navdata_CropBuffer(int cropsize);
 uint16_t navdata_checksum(void);
 
 void navdata_event(void (* _navdata_handler)(void));
+
+int16_t navdata_getHeight(void);
 
 #define NavdataEvent(_navdata_handler) { \
   navdata_event(_navdata_handler); \

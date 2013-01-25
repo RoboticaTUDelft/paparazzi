@@ -97,6 +97,11 @@ int main( void ) {
 	printf("Kill Parrot's program.elf! \n");
 	int rc = system("/usr/bin/killall program.elf > /dev/null 2>&1");
 	printf("killall program.elf => returncode=%d  (0=killed,256=not found)\n",rc);
+
+	system("insmod /data/video/modules/usbserial.ko");
+	system("insmod /data/video/modules/cdc-acm.ko");
+	system("insmod /data/video/modules/ftdi_sio.ko");
+
 #endif
 
 	main_init();
