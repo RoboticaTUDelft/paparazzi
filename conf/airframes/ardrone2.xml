@@ -25,7 +25,7 @@
 		<subsystem name="gps" type="ublox"/>
 		<subsystem name="stabilization" type="int_quat"/>
 		<subsystem name="ahrs" type="int_cmpl_quat"/>
-		<subsystem name="ins" />
+		<subsystem name="ins"/>
 
 	</firmware>
 
@@ -150,9 +150,9 @@
 
 	<section name="STABILIZATION_ATTITUDE" prefix="STABILIZATION_ATTITUDE_">
 		<!-- setpoints -->
-		<define name="SP_MAX_PHI" value="45." unit="deg"/>
-		<define name="SP_MAX_THETA" value="45." unit="deg"/>
-		<define name="SP_MAX_R" value="90." unit="deg/s"/>
+		<define name="SP_MAX_PHI" value="15" unit="deg"/>
+		<define name="SP_MAX_THETA" value="15" unit="deg"/>
+		<define name="SP_MAX_R" value="90" unit="deg/s"/>
 		<define name="DEADBAND_A" value="0"/>
 		<define name="DEADBAND_E" value="0"/>
 		<define name="DEADBAND_R" value="250"/>
@@ -174,22 +174,22 @@
 		<define name="REF_MAX_RDOT" value="RadOfDeg(1800.)"/>
 
 		<!-- feedback -->
-		<define name="PHI_PGAIN" value="692"/>
-		<define name="PHI_DGAIN" value="229"/>
-		<define name="PHI_IGAIN" value="11"/>
+		<define name="PHI_PGAIN" value="606"/>
+		<define name="PHI_DGAIN" value="303"/>
+		<define name="PHI_IGAIN" value="0"/>
 
-		<define name="THETA_PGAIN" value="696"/>
-		<define name="THETA_DGAIN" value="229"/>
-		<define name="THETA_IGAIN" value="12"/>
+		<define name="THETA_PGAIN" value="606"/>
+		<define name="THETA_DGAIN" value="303"/>
+		<define name="THETA_IGAIN" value="0"/>
 
-		<define name="PSI_PGAIN" value="1"/>
-		<define name="PSI_DGAIN" value="1"/>
+		<define name="PSI_PGAIN" value="205"/>
+		<define name="PSI_DGAIN" value="296"/>
 		<define name="PSI_IGAIN" value="0"/>
 
 		<!-- feedforward -->
 		<define name="PHI_DDGAIN" value="0"/>
 		<define name="THETA_DDGAIN" value="0"/>
-		<define name="PSI_DDGAIN" value="0"/>
+		<define name="PSI_DDGAIN" value="10."/>
 	</section>
 
 	<section name="GUIDANCE_V" prefix="GUIDANCE_V_">

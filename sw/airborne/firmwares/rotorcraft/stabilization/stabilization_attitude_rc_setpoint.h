@@ -75,7 +75,8 @@ static inline void stabilization_attitude_read_rc_setpoint_eulers(struct Int32Eu
 
   if (in_flight) {
     if (YAW_DEADBAND_EXCEEDED()) {
-      sp->psi += ((int32_t) radio_control.values[RADIO_YAW] * SP_MAX_R / MAX_PPRZ / RC_UPDATE_FREQ);
+    	printf("Yaw deadband excdeeded!\n");
+      sp->psi += ((int32_t) radio_control.values[RADIO_YAW] * SP_MAX_R / MAX_PPRZ / 1000);
       INT32_ANGLE_NORMALIZE(sp->psi);
     }
 #ifdef STABILIZATION_ATTITUDE_SP_PSI_DELTA_LIMIT
