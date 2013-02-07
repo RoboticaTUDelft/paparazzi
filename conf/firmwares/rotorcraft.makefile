@@ -100,7 +100,8 @@ ap.srcs += $(SRC_ARCH)/mcu_periph/uart_arch.c
 
 # I2C is needed for speed controllers and barometers on lisa and AR Drone 2
 ifeq ($(TARGET), ap)
-  include $(CFG_SHARED)/i2c_select.makefile
+$(TARGET).srcs += mcu_periph/i2c.c
+$(TARGET).srcs += $(SRC_ARCH)/mcu_periph/i2c_arch.c
 endif
 
 ap.srcs += subsystems/commands.c
@@ -137,21 +138,30 @@ ap.srcs += subsystems/actuators.c
 #
 # BARO
 #
-ap.srcs += $(SRC_BOARD)/baro_board.c
+BARO = BARO_I2C
 ifeq ($(BOARD), booz)
+ap.srcs += $(SRC_BOARD)/baro_board.c
 else ifeq ($(BOARD), lisa_l)
 ap.CFLAGS += -DUSE_I2C2
+ap.srcs += $(SRC_BOARD)/baro_board.c
 else ifeq ($(BOARD), lisa_m)
-ap.CFLAGS += -DUSE_I2C2
-#else ifeq ($(BOARD), ardrone)
-#ap.CFLAGS += -DUSE_I2C2
+  ifeq ($(BARO), BARO_SPI)
+    include $(CFG_SHARED)/spi.makefile
+    ap.CFLAGS += -DUSE_SPI2 -DUSE_SPI_SLAVE3
+    ap.srcs += $(SRC_BOARD)/baro_board_spi.c
+  else ifeq ($(BARO), BARO_I2C)
+    ap.CFLAGS += -DUSE_I2C2
+    ap.srcs += $(SRC_BOARD)/baro_board_i2c.c
+  else ifeq ($(BARO), BARO_ASPIRIN)
+    ap.srcs += $(SRC_BOARD)/baro_board.c
+  endif
+  ap.CFLAGS += -D$(BARO)
 else ifeq ($(BOARD), navgo)
-ap.CFLAGS += -DUSE_SPI
+include $(CFG_SHARED)/spi.makefile
 ap.CFLAGS += -DUSE_SPI_SLAVE0
 ap.CFLAGS += -DUSE_SPI1
-ap.CFLAGS += -DSPI_MASTER
-ap.srcs += mcu_periph/spi.c $(SRC_ARCH)/mcu_periph/spi_arch.c
 ap.srcs += peripherals/mcp355x.c
+ap.srcs += $(SRC_BOARD)/baro_board.c
 endif
 ifneq ($(BARO_LED),none)
 ap.CFLAGS += -DROTORCRAFT_BARO_LED=$(BARO_LED)
@@ -162,8 +172,6 @@ endif
 #
 
 ifeq ($(ARCH), lpc21)
-ap.CFLAGS += -DADC0_VIC_SLOT=2
-ap.CFLAGS += -DADC1_VIC_SLOT=3
 ap.CFLAGS += -DUSE_ADC
 ap.srcs   += $(SRC_ARCH)/mcu_periph/adc_arch.c
 ap.srcs   += subsystems/electrical.c

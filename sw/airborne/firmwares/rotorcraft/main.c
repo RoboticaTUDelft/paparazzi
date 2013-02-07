@@ -20,6 +20,12 @@
  *
  */
 
+/**
+ * @file firmwares/rotorcraft/main.c
+ *
+ * Rotorcraft main loop.
+ */
+
 #define MODULES_C
 
 #include <inttypes.h>
@@ -170,6 +176,10 @@ STATIC_INLINE void main_init( void ) {
   settings_init();
 
   mcu_int_enable();
+
+#if DATALINK == XBEE
+  xbee_init();
+#endif
 
   // register the timers for the periodic functions
   main_periodic_tid = sys_time_register_timer((1./PERIODIC_FREQUENCY), NULL);

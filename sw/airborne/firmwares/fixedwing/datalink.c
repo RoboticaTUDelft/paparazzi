@@ -17,12 +17,14 @@
  * along with paparazzi; see the file COPYING.  If not, write to
  * the Free Software Foundation, 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
+ */
+
+/**
+ * @file firmwares/fixedwing/datalink.c
+ * Handling of messages coming from ground and other A/Cs.
  *
  */
-/** \file datalink.c
- *  \brief Handling of messages coming from ground and other A/Cs
- *
- */
+
 #define DATALINK_C
 
 #define MODULES_DATALINK_C
