@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Felix Ruess <felix.ruess@gmail.com>
+ * Copyright (C) 2012 Gautier Hattenberger (ENAC)
  *
  * This file is part of paparazzi.
  *
@@ -17,29 +17,16 @@
  * along with paparazzi; see the file COPYING.  If not, write to
  * the Free Software Foundation, 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
+ *
  */
 
-#include "subsystems/imu.h"
+#ifndef BARO_MPL3115_H
+#define BARO_MPL3115_H
 
-#include "generated/airframe.h"
+#include "peripherals/mpl3115.h"
 
+extern void baro_mpl3115_init( void );
+extern void baro_mpl3115_read_periodic( void );
+extern void baro_mpl3115_read_event( void );
 
-#if USE_NPS
-#include "nps_sensors.h"
-
-void imu_feed_gyro_accel(void) {
-
-  RATES_ASSIGN(imu.gyro_unscaled, sensors.gyro.value.x, sensors.gyro.value.y, sensors.gyro.value.z);
-  VECT3_ASSIGN(imu.accel_unscaled, sensors.accel.value.x, sensors.accel.value.y, sensors.accel.value.z);
-
-  // set availability flags...
-  imu_aspirin2.imu_available = true;
-
-}
-
-
-void imu_feed_mag(void) {
-  VECT3_ASSIGN(imu.mag_unscaled, sensors.mag.value.x, sensors.mag.value.y, sensors.mag.value.z);
-  imu_aspirin2.imu_available = true;
-}
 #endif

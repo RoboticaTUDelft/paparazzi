@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Felix Ruess <felix.ruess@gmail.com>
+ * Copyright (C) 2012 Pranay Sinha <psinha@transition-robotics.com>
  *
  * This file is part of paparazzi.
  *
@@ -20,10 +20,31 @@
  */
 
 /**
- * simulator plug for the aspirin2 imu arch dependant functions.
+ * @file gain_scheduling.h
+ *
+ * Module that interpolates between gain sets, depending on the scheduling variable.
  */
-#ifndef IMU_ASPIRIN2_ARCH_H
-#define IMU_ASPIRIN2_ARCH_H
 
+#ifndef GAIN_SCHEDULING_H
+#define GAINS_SCHEDULING_H
 
-#endif /* IMU_ASPIRIN2_ARCH_H */
+#include "generated/airframe.h"
+#include "firmwares/rotorcraft/stabilization/stabilization_attitude_int.h"
+
+extern struct Int32AttitudeGains gainlibrary[NUMBER_OF_GAINSETS];
+
+/**
+ * Initialises periodic loop;
+ */
+extern void gain_scheduling_init(void);
+
+/**
+ * Periodic function that interpolates between gain sets depending on the scheduling variable.
+ * If the variable has not changed, keep the same gain set.
+ */
+extern void gain_scheduling_periodic(void);
+
+void set_gainset(int gainset);
+
+#endif  /* GAIN_SCHEDULING_H */
+
