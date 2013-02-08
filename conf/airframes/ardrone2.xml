@@ -62,10 +62,10 @@
 
 	<command_laws>
 		<call fun="motor_mixing_run(autopilot_motors_on,FALSE,values)"/>
+		<set servo="TOP_LEFT" value="motor_mixing.commands[SERVO_TOP_LEFT]"/>
 		<set servo="TOP_RIGHT" value="motor_mixing.commands[SERVO_TOP_RIGHT]"/>
 		<set servo="BOTTOM_LEFT" value="motor_mixing.commands[SERVO_BOTTOM_LEFT]"/>
 		<set servo="BOTTOM_RIGHT" value="motor_mixing.commands[SERVO_BOTTOM_RIGHT]"/>
-		<set servo="TOP_LEFT" value="motor_mixing.commands[SERVO_TOP_LEFT]"/>
 	</command_laws>
 
 	<section name="IMU" prefix="IMU_">
@@ -218,7 +218,7 @@
 	</section>
 
 	<section name="SIMULATOR" prefix="NPS_">
-		<define name="ACTUATOR_NAMES" value="{&quot;top_right_motor&quot;, &quot;bottom_left_motor&quot;, &quot;bottom_right_motor&quot;, &quot;top_left_motor&quot;}"/>
+		<define name="ACTUATOR_NAMES" value="{&quot;top_left_motor&quot;, &quot;top_right_motor&quot;, &quot;bottom_right_motor&quot;, &quot;bottom_left_motor&quot;}"/>
 		<define name="INITIAL_CONDITITONS" value="&quot;reset00&quot;"/>
 		<define name="SENSORS_PARAMS" value="&quot;nps_sensors_params_default.h&quot;"/>
 	</section>

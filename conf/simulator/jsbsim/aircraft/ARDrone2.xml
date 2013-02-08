@@ -121,7 +121,7 @@
     </ground_reactions>
 
 	<propulsion>
-	  <engine file="Parrot_engine" name="LeftBack">
+	  <engine file="Parrot_engine" name="bottom_left_motor">
 	   <location unit="M">
 		<x>  0.1319 </x>
 		<y>   0.14538 </y>
@@ -149,7 +149,7 @@
 	   </thruster>
 	  </engine>
 
-	  <engine file="Parrot_engine" name="RightBack">
+	  <engine file="Parrot_engine" name="bottom_right_motor">
 	   <location unit="M">
 		<x>   -0.1319 </x>
 		<y>   0.14538 </y>
@@ -177,7 +177,7 @@
 	   </thruster>
 	  </engine>
 
-	  <engine file="Parrot_engine" name="LeftFront">
+	  <engine file="Parrot_engine" name="top_left_motor">
 	   <location unit="M">
 		<x>   0.1319 </x>
 		<y>   -0.14538 </y>
@@ -205,7 +205,7 @@
 	   </thruster>
 	  </engine>
 
-	  <engine file="Parrot_engine" name="RightFront">
+	  <engine file="Parrot_engine" name="top_right_motor">
 	   <location unit="M">
 		<x>   -0.1319 </x>
 		<y>  -0.1453 </y>
