@@ -104,7 +104,8 @@ void Mapping::mappingStep () {
 	}
 	case FIND_BEST_FRONTIER:
 		index = bestFrontier();
-		if(&(paths[index]->back()->pos) != pos.getPos()) {
+		
+		if(&(paths[index]->back()->pos) == pos.getPos()) {
 			int j;
 			list<Frontier *>::iterator it;
 			for(j = 0, it = frontiers.begin(); (unsigned) j != index; j++) {
