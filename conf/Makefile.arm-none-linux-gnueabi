@@ -4,16 +4,17 @@
 # Minimal makefile for arm-none-linux-gnueabi toolchain. Assuming installed in default installation.
 # todo: make it dynamically find the toolchain
 
-CC   = /usr/local/codesourcery/arm-2011.03/bin/arm-none-linux-gnueabi-gcc
-LD   = /usr/local/codesourcery/arm-2011.03/bin/arm-none-linux-gnueabi-gcc
-AR   = /usr/local/codesourcery/arm-2011.03/bin/arm-none-linux-gnueabi-ar
-CP   = /usr/local/codesourcery/arm-2011.03/bin/arm-none-linux-gnueabi-objcopy
-DMP  = /usr/local/codesourcery/arm-2011.03/bin/arm-none-linux-gnueabi-objdump
-NM   = /usr/local/codesourcery/arm-2011.03/bin/arm-none-linux-gnueabi-nm
-SIZE = /usr/local/codesourcery/arm-2011.03/bin/arm-none-linux-gnueabi-size
-GDB  = /usr/local/codesourcery/arm-2011.03/bin/arm-none-linux-gnueabi-gdb
-TOOLCHAIN_DIR=/usr/local/codesourcery/arm-2011.03
-GCC_LIB_DIR=$(TOOLCHAIN_DIR)/arm-none-linux-gnueabi/lib
+CXX  = $(shell which arm-linux-gnueabi-g++)
+CC   = $(shell which arm-linux-gnueabi-gcc)
+LD   = $(shell which arm-linux-gnueabi-gcc)
+AR   = $(shell which arm-linux-gnueabi-ar)
+CP   = $(shell which arm-linux-gnueabi-objcopy)
+DMP  = $(shell which arm-linux-gnueabi-objdump)
+NM   = $(shell which arm-linux-gnueabi-nm)
+SIZE = $(shell which arm-linux-gnueabi-size)
+GDB  = $(shell which arm-linux-gnueabi-gdb)
+TOOLCHAIN_DIR=/usr/arm-linux-gnueabi
+GCC_LIB_DIR=$(TOOLCHAIN_DIR)/lib
 
 # checking if gcc has thumb2 instruction
 MULTILIB = $(shell if $(CC) --print-multi-lib | grep thumb2 > /dev/null ; then echo "yes"; else echo "no"; fi)
@@ -22,3 +23,6 @@ MULTILIB = $(shell if $(CC) --print-multi-lib | grep thumb2 > /dev/null ; then e
 RM = rm
 
 	@echo "Using CC   = $(CC)"
+
+CFLAGS += -I/usr/arm-linux-gnueabi/include
+	

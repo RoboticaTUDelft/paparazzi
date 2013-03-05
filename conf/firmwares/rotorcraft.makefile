@@ -144,6 +144,8 @@ ap.srcs += $(SRC_BOARD)/baro_board.c
 else ifeq ($(BOARD), lisa_l)
 ap.CFLAGS += -DUSE_I2C2
 ap.srcs += $(SRC_BOARD)/baro_board.c
+else ifeq ($(BOARD), ardrone)
+ap.srcs += $(SRC_BOARD)/baro_board.c
 else ifeq ($(BOARD), lisa_m)
   ifeq ($(BARO), BARO_SPI)
     include $(CFG_SHARED)/spi.makefile
