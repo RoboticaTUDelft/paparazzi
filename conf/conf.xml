@@ -1,6 +1,6 @@
 <conf>
   <aircraft
-   name="Ardrone2"
+   name="ardrone2"
    ac_id="150"
    airframe="airframes/ardrone2.xml"
    radio="radios/cockpitSX.xml"
