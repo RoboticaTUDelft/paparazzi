@@ -81,9 +81,19 @@
 #include "arch/omap_ardrone2/subsystems/actuators/actuators_at.h"
 #endif
 
+/* if PRINT_CONFIG is defined, print some config options */
+PRINT_CONFIG_VAR(PERIODIC_FREQUENCY)
+
+#ifndef MODULES_FREQUENCY
+#define MODULES_FREQUENCY 512
+#endif
+PRINT_CONFIG_VAR(MODULES_FREQUENCY)
+
 #ifndef BARO_PERIODIC_FREQUENCY
 #define BARO_PERIODIC_FREQUENCY 50
 #endif
+PRINT_CONFIG_VAR(BARO_PERIODIC_FREQUENCY)
+
 
 #if USE_IMU
 static inline void on_gyro_event( void );
@@ -98,12 +108,13 @@ static inline void on_baro_dif_event( void );
 static inline void on_gps_event( void );
 
 
-tid_t main_periodic_tid; 	///< id for main_periodic() timer
-tid_t failsafe_tid;      	///< id for failsafe_check() timer
-tid_t radio_control_tid; 	///< id for radio_control_periodic_task() timer
-tid_t electrical_tid;    	///< id for electrical_periodic() timer
-tid_t baro_tid;          	///< id for baro_periodic() timer
-tid_t telemetry_tid;     	///< id for telemetry_periodic() timer
+tid_t main_periodic_tid; ///< id for main_periodic() timer
+tid_t modules_tid;       ///< id for modules_periodic_task() timer
+tid_t failsafe_tid;      ///< id for failsafe_check() timer
+tid_t radio_control_tid; ///< id for radio_control_periodic_task() timer
+tid_t electrical_tid;    ///< id for electrical_periodic() timer
+tid_t baro_tid;          ///< id for baro_periodic() timer
+tid_t telemetry_tid;     ///< id for telemetry_periodic() timer
 
 #ifndef SITL
 int main( void ) {
@@ -171,6 +182,7 @@ STATIC_INLINE void main_init( void ) {
 
   // register the timers for the periodic functions
   main_periodic_tid = sys_time_register_timer((1./PERIODIC_FREQUENCY), NULL);
+  modules_tid = sys_time_register_timer(1./MODULES_FREQUENCY, NULL);
   radio_control_tid = sys_time_register_timer((1./60.), NULL);
   failsafe_tid = sys_time_register_timer(0.05, NULL);
   electrical_tid = sys_time_register_timer(0.1, NULL);
@@ -181,6 +193,8 @@ STATIC_INLINE void main_init( void ) {
 STATIC_INLINE void handle_periodic_tasks( void ) {
   if (sys_time_check_and_ack_timer(main_periodic_tid))
     main_periodic();
+  if (sys_time_check_and_ack_timer(modules_tid))
+    modules_periodic_task();
   if (sys_time_check_and_ack_timer(radio_control_tid))
     radio_control_periodic_task();
   if (sys_time_check_and_ack_timer(failsafe_tid))
@@ -205,8 +219,6 @@ STATIC_INLINE void main_periodic( void ) {
   /* set actuators     */
   //actuators_set(autopilot_motors_on);
   SetActuatorsFromCommands(commands);
-
-  modules_periodic_task();
 
   if (autopilot_in_flight) {
     RunOnceEvery(PERIODIC_FREQUENCY, { autopilot_flight_time++; datalink_time++; });
@@ -265,7 +277,7 @@ STATIC_INLINE void main_event( void ) {
   GpsEvent(on_gps_event);
 #endif
 
-#ifdef FAILSAFE_GROUND_DETECT
+#if FAILSAFE_GROUND_DETECT || KILL_ON_GROUND_DETECT
   DetectGroundEvent();
 #endif
 

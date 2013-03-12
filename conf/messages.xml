@@ -245,7 +245,13 @@
     <field name="utm_zone" type="uint8"/>
   </message>
 
-  <!-- 36 is free -->
+  <message name="MKK" id="36">
+    <field name="nr" type="int8" unit="mA"/>
+    <field name="rpm" type="uint8" unit="Poles/s"/>
+    <field name="current" type="int8" unit="mA"/>
+    <field name="temp" type="int8" unit="deg"/>
+  </message>
+
 
   <message name="ENERGY" id="37">
     <field name="bat"      type="float" unit="V"/>
@@ -1489,7 +1495,14 @@
   </message>
 
 
- <!--179 is free -->
+  <message name="FLOW_AP_OTF" id="179">
+     <field name="counter"    type="uint32"/>
+     <field name="velocity"   type="int16"  unit="cm/s" alt_unit="m/s"/>
+     <field name="a_attack"   type="int16"  unit="centideg" alt_unit="deg"/>
+     <field name="a_sidesl"   type="int16"  unit="centideg" alt_unit="deg"/>
+     <field name="altitude"   type="int32"  unit="cm" alt_unit="m"/>
+     <field name="checksum"   type="uint8"/>
+  </message>
 
   <message name="FMS_TIME" id="180">
     <field name="tv_sec"   type="uint32"/>
@@ -1838,6 +1851,16 @@
    </message>
 
  <!--233 is free -->
+   <message name="PX4FLOW" id="233">
+     <!--field name="time_usec" type="uint64"/--> <!-- uint64 not supported yet -->
+     <field name="sensor_id" type="uint8"/>
+     <field name="flow_x" type="int16"/>
+     <field name="flow_y" type="int16"/>
+     <field name="flow_comp_m_x" type="float" unit="m"/>
+     <field name="flow_comp_m_y" type="float" unit="m"/>
+     <field name="quality" type="uint8"/>
+     <field name="ground_distance" type="float" unit="m"/>
+   </message>
 
   <message name="OPTICFLOW" id="234">
     <field name="flow" type="uint16"></field>
@@ -1849,7 +1872,11 @@
     <field name="y" type="uint16"></field>
   </message>
 
- <!--236 is free -->
+ <message name="SONAR" id="236">
+    <field name="sonar_meas" type="uint16"/>
+    <field name="sonar_distance" type="float" unit="m"/>
+  </message>
+
  <!--237 is free -->
 
   <message name="NPS_POS_LLH" id="238">

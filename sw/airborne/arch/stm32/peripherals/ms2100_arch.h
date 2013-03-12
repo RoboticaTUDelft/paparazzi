@@ -19,14 +19,25 @@
  * Boston, MA 02111-1307, USA.
  */
 
+/**
+ * @file arch/stm32/peripherals/ms2100_arch.h
+ *
+ * STM32 specific functions for the ms2100 magnetic sensor from PNI.
+ */
+
 #ifndef MS2100_ARCH_H
 #define MS2100_ARCH_H
 
 #include <libopencm3/stm32/f1/gpio.h>
 #include "mcu_periph/spi.h"
 
-#define Ms2100Reset() GPIOC_BSRR = GPIO13;
-#define Ms2100Set()   GPIOC_BRR = GPIO13
+static inline void Ms2100Reset(void) {
+  GPIOC_BSRR = GPIO13;
+}
+
+static inline void Ms2100Set(void) {
+  GPIOC_BRR = GPIO13;
+}
 
 #define Ms2100HasEOC() (gpio_get(GPIOB, GPIO5) != 0)
 
