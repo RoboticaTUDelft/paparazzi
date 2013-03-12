@@ -26,6 +26,10 @@
 #include <string.h>
 
 void sys_time_arch_init( void ) {
+
+	sys_time.cpu_ticks_per_sec = 1e6;
+	sys_time.resolution_cpu_ticks = (uint32_t)(sys_time.resolution * sys_time.cpu_ticks_per_sec + 0.5);
+
 	struct sigaction sa;
 	struct itimerval timer;
 
@@ -35,10 +39,10 @@ void sys_time_arch_init( void ) {
 
 	// timer expires after SYS_TIME_RESOLUTION sec
 	timer.it_value.tv_sec = 0;
-	timer.it_value.tv_usec = USEC_OF_SEC(SYS_TIME_RESOLUTION);
+	timer.it_value.tv_usec = USEC_OF_SEC(sys_time.resolution);
 	// and every SYS_TIME_RESOLUTION sec after that
 	timer.it_interval.tv_sec = 0;
-	timer.it_interval.tv_usec = USEC_OF_SEC(SYS_TIME_RESOLUTION);
+	timer.it_interval.tv_usec = USEC_OF_SEC(sys_time.resolution);
 
 	setitimer(ITIMER_REAL, &timer, NULL);
 }
@@ -46,9 +50,9 @@ void sys_time_arch_init( void ) {
 void sys_tick_handler( int signum ) {
 
   sys_time.nb_tick++;
-  sys_time.nb_sec_rem += SYS_TIME_RESOLUTION_CPU_TICKS;
-  if (sys_time.nb_sec_rem >= CPU_TICKS_PER_SEC) {
-    sys_time.nb_sec_rem -= CPU_TICKS_PER_SEC;
+  sys_time.nb_sec_rem += sys_time.resolution_cpu_ticks;;
+  if (sys_time.nb_sec_rem >= sys_time.cpu_ticks_per_sec) {
+    sys_time.nb_sec_rem -= sys_time.cpu_ticks_per_sec;
     sys_time.nb_sec++;
   }
   for (unsigned int i=0; i<SYS_TIME_NB_TIMER; i++) {
@@ -56,7 +60,9 @@ void sys_tick_handler( int signum ) {
         sys_time.nb_tick >= sys_time.timer[i].end_time) {
       sys_time.timer[i].end_time += sys_time.timer[i].duration;
       sys_time.timer[i].elapsed = TRUE;
-      if (sys_time.timer[i].cb) sys_time.timer[i].cb(i);
+      if (sys_time.timer[i].cb) {
+    	  sys_time.timer[i].cb(i);
+      }
     }
   }
 }
