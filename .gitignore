@@ -1,5 +1,6 @@
 # ignore html dir for github pages
 /doc/generated
+/doc/manual/generated
 
 *.so
 *.[oa]
@@ -25,6 +26,8 @@
 *.project
 *.externalToolBuilders
 .settings
+.pydevproject
+.metadata
 /build.properties
 /META-INF
 
@@ -133,7 +136,6 @@
 # /sw/simulator/
 /sw/simulator/gaia
 /sw/simulator/simhitl
-/sw/simulator/launchsitl
 
 # /sw/supervision/
 /sw/supervision/gtk_process.ml

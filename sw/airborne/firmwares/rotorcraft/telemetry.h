@@ -184,6 +184,14 @@
                   &imu.mag_unscaled.y,			\
                   &imu.mag_unscaled.z);		\
   }
+
+#define PERIODIC_SEND_IMU_MAG_CURRENT_CALIBRATION(_trans, _dev) {                               \
+    DOWNLINK_SEND_IMU_MAG_CURRENT_CALIBRATION(_trans, _dev,                                     \
+                  &imu.mag_unscaled.x,                  \
+                  &imu.mag_unscaled.y,                  \
+                  &imu.mag_unscaled.z,                  \
+                  &electrical.current);               \
+  }
 #else
 #define PERIODIC_SEND_IMU_GYRO_SCALED(_trans, _dev) {}
 #define PERIODIC_SEND_IMU_ACCEL_SCALED(_trans, _dev) {}
@@ -191,7 +199,10 @@
 #define PERIODIC_SEND_IMU_GYRO_RAW(_trans, _dev) {}
 #define PERIODIC_SEND_IMU_ACCEL_RAW(_trans, _dev) {}
 #define PERIODIC_SEND_IMU_MAG_RAW(_trans, _dev) {}
+#define PERIODIC_SEND_IMU_MAG_CURRENT_CALIBRATION(_trans, _dev) {}
 #endif
+
+
 
 #if USE_BAROMETER
 #include "subsystems/sensors/baro.h"
@@ -203,8 +214,6 @@
 #else
 #define PERIODIC_SEND_BARO_RAW(_trans, _dev) {}
 #endif
-
-
 
 #include "firmwares/rotorcraft/stabilization.h"
 #define PERIODIC_SEND_RATE_LOOP(_trans, _dev) {                          \
@@ -389,6 +398,17 @@
   }
 #else
 #define PERIODIC_SEND_AHRS_ARDRONE2(_trans, _dev) {}
+#endif
+
+#if USE_AHRS_CMPL_EULER || USE_AHRS_CMPL_QUAT
+#define PERIODIC_SEND_AHRS_GYRO_BIAS_INT(_trans, _dev) {    \
+  DOWNLINK_SEND_AHRS_GYRO_BIAS_INT(_trans, _dev,            \
+                                   &ahrs_impl.gyro_bias.p,  \
+                                   &ahrs_impl.gyro_bias.q,  \
+                                   &ahrs_impl.gyro_bias.r); \
+  }
+#else
+#define PERIODIC_SEND_AHRS_GYRO_BIAS_INT(_trans, _dev) {}
 #endif
 
 #if USE_AHRS_LKF
