@@ -52,7 +52,7 @@
     radio="radios/cockpitSX.xml"
     telemetry="telemetry/default_rotorcraft.xml"
     flight_plan="flight_plans/rotorcraft_basic.xml"
-    settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/control/stabilization_att_int.xml settings/control/stabilization_rate.xml settings/nps.xml"
+    settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/control/stabilization_att_int.xml settings/control/stabilization_rate.xml"
     gui_color="white"
     />
   <aircraft
@@ -134,6 +134,16 @@
    telemetry="telemetry/dummy.xml"
    flight_plan="flight_plans/dummy.xml"
    settings=" settings/test_fixedwing_actuators.xml"
+   gui_color="blue"
+  />
+<aircraft
+   name="Twinstar_energyadaptive"
+   ac_id="13"
+   airframe="airframes/examples/Twinstar_energyadaptive.xml"
+   radio="radios/Corona_24_DIY.xml"
+   telemetry="telemetry/default_fixedwing_imu.xml"
+   flight_plan="flight_plans/basic.xml"
+   settings=" settings/fixedwing_basic.xml settings/control/ctl_energyadaptive.xml"
    gui_color="blue"
   />
 </conf>

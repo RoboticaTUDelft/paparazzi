@@ -95,7 +95,8 @@ void autopilot_init(void) {
 void autopilot_periodic(void) {
 
   RunOnceEvery(NAV_PRESCALER, nav_periodic_task());
-#ifdef FAILSAFE_GROUND_DETECT
+#if FAILSAFE_GROUND_DETECT
+INFO("Using FAILSAFE_GROUND_DETECT")
   if (autopilot_mode == AP_MODE_FAILSAFE && autopilot_detect_ground) {
     autopilot_set_mode(AP_MODE_KILL);
     autopilot_detect_ground = FALSE;
@@ -103,7 +104,7 @@ void autopilot_periodic(void) {
 #endif
 
   /* set failsafe commands, if in FAILSAFE or KILL mode */
-#ifndef FAILSAFE_GROUND_DETECT
+#if !FAILSAFE_GROUND_DETECT
   if (autopilot_mode == AP_MODE_KILL ||
       autopilot_mode == AP_MODE_FAILSAFE) {
 #else
@@ -255,7 +256,11 @@ void autopilot_on_rc_frame(void) {
     uint8_t new_autopilot_mode = 0;
     AP_MODE_OF_PPRZ(radio_control.values[RADIO_MODE], new_autopilot_mode);
     /* don't enter NAV mode if GPS is lost (this also prevents mode oscillations) */
-    if (!(new_autopilot_mode == AP_MODE_NAV && GpsIsLost()))
+    if (!(new_autopilot_mode == AP_MODE_NAV
+#if USE_GPS
+          && GpsIsLost()
+#endif
+       ))
       autopilot_set_mode(new_autopilot_mode);
   }
 
